@@ -8,6 +8,7 @@ interface WordsState {
   currentWordId: string | null;
   isReversedMode: boolean;
   exerciseComplete: boolean;
+  unlockedWordIds: string[]; // IDs of words that are currently unlocked for practice
 }
 
 const initialState: WordsState = {
@@ -16,6 +17,7 @@ const initialState: WordsState = {
   currentWordId: null,
   isReversedMode: false,
   exerciseComplete: false,
+  unlockedWordIds: [],
 };
 
 const wordsSlice = createSlice({
@@ -51,9 +53,17 @@ const wordsSlice = createSlice({
       progress.timesCorrect += 1;
       progress.lastPracticed = Date.now();
 
-      // After 3 correct, switch to reversed mode
+      // After 3 correct, switch to reversed mode and unlock next word
       if (progress.correctStreak === 3) {
         progress.isReversed = true;
+        // Unlock the next word
+        const allWordIds = state.words.map(w => w.id);
+        for (const id of allWordIds) {
+          if (!state.unlockedWordIds.includes(id)) {
+            state.unlockedWordIds.push(id);
+            break;
+          }
+        }
       }
 
       // After 4 correct (3 normal + 1 reversed), mark as completed
@@ -96,6 +106,21 @@ const wordsSlice = createSlice({
       });
       state.exerciseComplete = false;
     },
+
+    setUnlockedWords: (state, action: PayloadAction<string[]>) => {
+      state.unlockedWordIds = action.payload;
+    },
+
+    unlockNextWord: (state) => {
+      // Unlock the next word that hasn't been unlocked yet
+      const allWordIds = state.words.map(w => w.id);
+      for (const wordId of allWordIds) {
+        if (!state.unlockedWordIds.includes(wordId)) {
+          state.unlockedWordIds.push(wordId);
+          break;
+        }
+      }
+    },
   },
 });
 
@@ -107,6 +132,8 @@ export const {
   answerWrong,
   setExerciseComplete,
   resetWordsProgress,
+  setUnlockedWords,
+  unlockNextWord,
 } = wordsSlice.actions;
 
 export default wordsSlice.reducer;
@@ -124,11 +151,42 @@ export const selectLessonWordsProgress = (lessonId: number) => (state: { words: 
   const words = state.words.words.filter(w => w.lessonId === lessonId);
   if (words.length === 0) return 0;
 
-  const totalPoints = words.length * 4; // 4 correct answers per word
-  const earnedPoints = words.reduce((sum, word) => {
+  // Calculate progress based on unlocked words only
+  const unlockedWords = words.filter(w => state.words.unlockedWordIds.includes(w.id));
+  if (unlockedWords.length === 0) return 0;
+
+  const totalPoints = unlockedWords.length * 4; // 4 correct answers per word
+  const earnedPoints = unlockedWords.reduce((sum, word) => {
     const progress = state.words.progress[word.id];
     return sum + (progress?.correctStreak || 0);
   }, 0);
 
   return Math.round((earnedPoints / totalPoints) * 100);
+};
+
+// Check if all words in the lesson are completed
+export const selectLessonWordsComplete = (lessonId: number) => (state: { words: WordsState }) => {
+  const words = state.words.words.filter(w => w.lessonId === lessonId);
+  if (words.length === 0) return false;
+
+  // Check if all unlocked words are completed
+  const unlockedWords = words.filter(w => state.words.unlockedWordIds.includes(w.id));
+  if (unlockedWords.length === 0) return false;
+
+  // Check if all words are unlocked and completed
+  const allWordsUnlocked = unlockedWords.length === words.length;
+  const allCompleted = unlockedWords.every(w => {
+    const progress = state.words.progress[w.id];
+    return progress?.completed === true;
+  });
+
+  return allWordsUnlocked && allCompleted;
+};
+
+export const selectUnlockedWords = (state: { words: WordsState }) =>
+  state.words.unlockedWordIds;
+
+export const selectUnlockedWordsByLesson = (lessonId: number) => (state: { words: WordsState }) => {
+  const words = state.words.words.filter(w => w.lessonId === lessonId);
+  return words.filter(w => state.words.unlockedWordIds.includes(w.id));
 };

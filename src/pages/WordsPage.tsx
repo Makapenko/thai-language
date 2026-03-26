@@ -11,6 +11,9 @@ import {
   answerWrong,
   selectWordsProgress,
   selectLessonWordsProgress,
+  setUnlockedWords,
+  selectUnlockedWordsByLesson,
+  selectLessonWordsComplete,
 } from '../features/words/wordsSlice';
 import { speakThai } from '../utils/speech';
 import { getOptionsWithCorrect, shuffle } from '../utils/shuffle';
@@ -27,6 +30,8 @@ export function WordsPage() {
 
   const wordsProgress = useAppSelector(selectWordsProgress);
   const overallProgress = useAppSelector(selectLessonWordsProgress(id));
+  const unlockedWords = useAppSelector(selectUnlockedWordsByLesson(id));
+  const isLessonComplete = useAppSelector(selectLessonWordsComplete(id));
 
   const [currentWord, setCurrentWord] = useState<Word | null>(null);
   const [options, setOptions] = useState<Word[]>([]);
@@ -44,13 +49,16 @@ export function WordsPage() {
   // Initialize words in Redux
   useEffect(() => {
     dispatch(setWords(lessonWords));
+    // Unlock first 10 words at the start
+    const first10Words = lessonWords.slice(0, 10).map(w => w.id);
+    dispatch(setUnlockedWords(first10Words));
   }, [dispatch, lessonWords]);
 
   // Get next word to practice - uses ref to avoid dependency on wordsProgress
   const getNextWord = useCallback(() => {
     const progress = wordsProgressRef.current;
-    // Find words that are not completed
-    const incompleteWords = lessonWords.filter((word) => {
+    // Find unlocked words that are not completed
+    const incompleteWords = unlockedWords.filter((word) => {
       const wordProgress = progress[word.id];
       return !wordProgress || !wordProgress.completed;
     });
@@ -74,7 +82,7 @@ export function WordsPage() {
     });
 
     return shuffle(candidateWords)[0];
-  }, [lessonWords]);
+  }, [unlockedWords]);
 
   // Set up new question
   const setupQuestion = useCallback(() => {
@@ -88,23 +96,23 @@ export function WordsPage() {
     setSelectedOption(null);
     setShowResult(false);
 
-    // Generate options
+    // Generate options from unlocked words only
     const wordOptions = getOptionsWithCorrect(
-      lessonWords,
+      unlockedWords,
       nextWord,
       OPTIONS_COUNT,
       (w) => w.id
     );
     setOptions(wordOptions);
-  }, [getNextWord, lessonWords]);
+  }, [getNextWord, unlockedWords]);
 
   // Initial setup - only run once
   useEffect(() => {
-    if (!isInitialized && lessonWords.length > 0) {
+    if (!isInitialized && unlockedWords.length > 0) {
       setupQuestion();
       setIsInitialized(true);
     }
-  }, [isInitialized, lessonWords.length, setupQuestion]);
+  }, [isInitialized, unlockedWords.length, setupQuestion]);
 
   // Get current word progress
   const currentWordProgress = currentWord ? wordsProgress[currentWord.id] : null;
@@ -152,7 +160,7 @@ export function WordsPage() {
   };
 
   // Check if exercise is complete
-  const isComplete = currentWord === null;
+  const isComplete = isLessonComplete;
 
   if (isComplete) {
     return (
@@ -189,6 +197,17 @@ export function WordsPage() {
               Перейти к фразам
             </Button>
           </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Guard: if currentWord is null during initialization, show loading
+  if (!currentWord) {
+    return (
+      <div className={styles.container}>
+        <Card variant="elevated" className={styles.questionCard}>
+          <div className={styles.loading}>Загрузка...</div>
         </Card>
       </div>
     );

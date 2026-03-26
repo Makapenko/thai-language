@@ -22,7 +22,6 @@ import {
 } from '../features/phrases/phrasesSlice';
 import { speakThai, speakThaiPhrase } from '../utils/speech';
 import { shuffle } from '../utils/shuffle';
-import type { Word } from '../data/types';
 import styles from './PhrasesPage.module.css';
 
 // Статус слова в списке ошибок
@@ -40,9 +39,9 @@ const OPTIONS_PER_GROUP = 4;
 
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
-  const words: Word[] = [...lesson1WordGroups.flatMap(g => g.options)];
-  const word = words.find(w => w.thai === thai);
-  return word ? word.id : null;
+  const wordOptions = lesson1WordGroups.flatMap(g => g.options);
+  const word = wordOptions.find(w => w.thai === thai);
+  return word ? `w1-${wordOptions.indexOf(word) + 1}` : null;
 };
 
 // Get audio file path for a Thai word
