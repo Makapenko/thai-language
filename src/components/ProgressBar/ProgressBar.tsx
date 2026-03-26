@@ -35,7 +35,7 @@ export function ProgressBar({
           aria-valuemax={100}
         />
       </div>
-      {showLabel && <span className={styles.label}>{clampedValue}%</span>}
+      {showLabel && <span className={styles.label}>{clampedValue.toFixed(1)}%</span>}
     </div>
   );
 }

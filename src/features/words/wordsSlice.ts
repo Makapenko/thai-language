@@ -151,17 +151,17 @@ export const selectLessonWordsProgress = (lessonId: number) => (state: { words: 
   const words = state.words.words.filter(w => w.lessonId === lessonId);
   if (words.length === 0) return 0;
 
-  // Calculate progress based on unlocked words only
-  const unlockedWords = words.filter(w => state.words.unlockedWordIds.includes(w.id));
-  if (unlockedWords.length === 0) return 0;
-
-  const totalPoints = unlockedWords.length * 4; // 4 correct answers per word
-  const earnedPoints = unlockedWords.reduce((sum, word) => {
+  // Total points based on ALL words in the lesson (4 correct answers per word)
+  const totalPoints = words.length * 4;
+  
+  // Calculate earned points from all words
+  const earnedPoints = words.reduce((sum, word) => {
     const progress = state.words.progress[word.id];
     return sum + (progress?.correctStreak || 0);
   }, 0);
 
-  return Math.round((earnedPoints / totalPoints) * 100);
+  // Return percentage with one decimal place
+  return parseFloat(((earnedPoints / totalPoints) * 100).toFixed(1));
 };
 
 // Check if all words in the lesson are completed
