@@ -1,0 +1,73 @@
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.header {
+  background-color: var(--color-bg-card);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-dropdown);
+}
+
+.headerContent {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: var(--spacing-sm) var(--container-padding);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.backLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background-color var(--transition-fast);
+}
+
+.backLink:hover {
+  background-color: var(--color-bg-hover);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.logoThai {
+  font-family: var(--font-thai);
+  font-size: var(--font-size-lg);
+  color: var(--color-thai);
+}
+
+.logoText {
+  font-weight: var(--font-weight-bold);
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+}
+
+.main {
+  flex: 1;
+  padding: var(--spacing-md) var(--container-padding);
+  max-width: var(--container-max);
+  width: 100%;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .headerContent {
+    padding: var(--spacing-md) var(--container-padding);
+  }
+
+  .main {
+    padding: var(--spacing-lg) var(--container-padding);
+  }
+}

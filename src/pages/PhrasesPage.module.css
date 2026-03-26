@@ -1,0 +1,409 @@
+/* Обёртка страницы для размещения основного контента и боковой панели */
+.pageWrapper {
+  display: flex;
+  gap: var(--spacing-lg);
+  max-width: 900px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  flex: 1;
+  max-width: 600px;
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.questionCard {
+  padding: var(--spacing-lg);
+  position: relative;
+}
+
+.retryBadge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background-color: var(--color-warning);
+  color: var(--color-text-light);
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+}
+
+.russian {
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-medium);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.assemblyArea {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 2px dashed var(--color-border);
+  margin-bottom: var(--spacing-lg);
+}
+
+.assemblyAreaError {
+  border: 2px solid var(--color-error);
+  border-style: solid;
+}
+
+.placeholder {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.assembledParts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+.assembledPart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.assembledPart:hover {
+  background-color: var(--color-primary);
+  color: var(--color-text-light);
+}
+
+.assembledPart:hover .partThai {
+  color: var(--color-text-light);
+}
+
+.partThai {
+  font-family: var(--font-thai);
+  font-size: var(--font-size-lg);
+  color: var(--color-thai);
+}
+
+.partTranscription {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.optionsGroups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.optionsGroup {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-height: 70px;
+}
+
+.option:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+.optionThai {
+  font-family: var(--font-thai);
+  font-size: var(--font-size-lg);
+  color: var(--color-thai);
+}
+
+.optionTranscription {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.result {
+  margin-top: var(--spacing-md);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+}
+
+.resultMessage {
+  text-align: center;
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-md);
+}
+
+.resultCorrect {
+  color: var(--color-success);
+}
+
+.resultWrong {
+  color: var(--color-error);
+}
+
+/* Блок правильного ответа с зелёной окантовкой (такой же стиль как assemblyArea) */
+.correctAnswerBox {
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-md);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-success);
+  margin-top: var(--spacing-sm);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+  width: 100%;
+}
+
+.correctAnswerBox:hover {
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.correctAnswerParts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  justify-content: center;
+}
+
+.correctPart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: rgba(76, 175, 80, 0.1);
+  border: 1px solid var(--color-success);
+  border-radius: var(--radius-md);
+}
+
+.navigation {
+  display: flex;
+  justify-content: center;
+}
+
+/* Complete state */
+.completeCard {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.completeIcon {
+  color: var(--color-success);
+  margin-bottom: var(--spacing-md);
+}
+
+.completeTitle {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.completeStats {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.statValue {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-primary);
+}
+
+.statLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.completeActions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .optionsGroup {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Боковая панель с неправильными словами */
+.wrongWordsSidebar {
+  width: 220px;
+  background-color: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-md);
+  position: sticky;
+  top: var(--spacing-lg);
+  max-height: calc(100vh - var(--spacing-lg) * 2);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebarTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-error);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.wrongWordsList {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.wrongWordItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-sm);
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.wrongWordItem:hover {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-light);
+}
+
+/* Статус: красный (новая ошибка) */
+.wrongWordRed {
+  border-color: var(--color-error);
+  background-color: rgba(244, 67, 54, 0.1);
+}
+
+.wrongWordRed .wrongWordThai {
+  color: var(--color-error);
+}
+
+/* Статус: жёлтый (первый правильный ответ) */
+.wrongWordYellow {
+  border-color: var(--color-warning);
+  background-color: rgba(255, 152, 0, 0.1);
+}
+
+.wrongWordYellow .wrongWordThai {
+  color: var(--color-warning);
+}
+
+/* Статус: зелёный (второй правильный ответ) */
+.wrongWordGreen {
+  border-color: var(--color-success);
+  background-color: rgba(76, 175, 80, 0.1);
+}
+
+.wrongWordGreen .wrongWordThai {
+  color: var(--color-success);
+}
+
+/* Анимация удаления */
+.wrongWordRemoving {
+  opacity: 0;
+  transform: scale(0.8) translateX(20px);
+  pointer-events: none;
+}
+
+.wrongWordThai {
+  font-family: var(--font-thai);
+  font-size: var(--font-size-lg);
+  color: var(--color-thai);
+  line-height: 1.3;
+}
+
+.wrongWordTranscription {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
+.wrongWordRussian {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  margin-top: var(--spacing-xs);
+}
+
+/* Скрыть боковую панель на мобильных - показать под основным контентом */
+@media (max-width: 767px) {
+  .pageWrapper {
+    flex-direction: column;
+  }
+
+  .wrongWordsSidebar {
+    width: 100%;
+    position: static;
+    max-height: 200px;
+    order: -1;
+  }
+
+  .wrongWordsList {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--spacing-xs);
+  }
+
+  .wrongWordItem {
+    flex: 0 0 auto;
+    padding: var(--spacing-xs) var(--spacing-sm);
+  }
+
+  .wrongWordThai {
+    font-size: var(--font-size-base);
+  }
+
+  .wrongWordRussian {
+    display: none;
+  }
+}

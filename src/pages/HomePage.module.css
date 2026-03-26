@@ -1,0 +1,104 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.hero {
+  text-align: center;
+  padding: var(--spacing-lg) 0;
+}
+
+.title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.titleThai {
+  font-family: var(--font-thai);
+  color: var(--color-thai);
+  font-size: 2.5rem;
+}
+
+.subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-lg);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.lessonGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-md);
+}
+
+.lessonLink {
+  text-decoration: none;
+  display: block;
+}
+
+.lessonCard {
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  cursor: pointer;
+  height: 100%;
+}
+
+.lessonCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.lessonCardLocked {
+  opacity: 0.5;
+  cursor: not-allowed;
+  height: 100%;
+}
+
+.lessonNumber {
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.lessonTitle {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-xs);
+}
+
+.lessonDescription {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.lessonProgress {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.progressLabel {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 35px;
+}
+
+@media (min-width: 768px) {
+  .lessonGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .lessonGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

@@ -1,0 +1,52 @@
+.container {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+.track {
+  flex: 1;
+  background-color: var(--color-bg-hover);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width var(--transition-normal);
+}
+
+/* Variants */
+.fill-default {
+  background-color: var(--color-primary);
+}
+
+.fill-success {
+  background-color: var(--color-success);
+}
+
+.fill-error {
+  background-color: var(--color-error);
+}
+
+/* Sizes */
+.sm .track {
+  height: 4px;
+}
+
+.md .track {
+  height: 8px;
+}
+
+.lg .track {
+  height: 12px;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 40px;
+  text-align: right;
+}

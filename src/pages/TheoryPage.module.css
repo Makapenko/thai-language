@@ -1,0 +1,225 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  font-size: var(--font-size-xl);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.section {
+  padding: var(--spacing-md);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.sectionContent {
+  line-height: var(--line-height-relaxed);
+}
+
+.paragraph {
+  margin-bottom: var(--spacing-md);
+}
+
+.paragraph:last-child {
+  margin-bottom: 0;
+}
+
+.example {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  margin: var(--spacing-md) 0;
+}
+
+.exampleButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.exampleButton:hover {
+  background-color: var(--color-primary-light);
+}
+
+.example .thai {
+  display: block;
+  font-family: var(--font-thai);
+  font-size: var(--font-size-xl);
+  color: var(--color-thai);
+  margin-bottom: 0;
+}
+
+.sectionTableWrapper {
+  overflow-x: auto;
+  margin: var(--spacing-md) 0;
+}
+
+.sectionTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sectionTable th,
+.sectionTable td {
+  padding: var(--spacing-sm);
+  text-align: left;
+  border: 1px solid var(--color-border);
+}
+
+.sectionTable th {
+  background-color: var(--color-bg);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.sectionTable td {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.note {
+  background-color: var(--color-bg);
+  border-left: 3px solid var(--color-primary);
+  padding: var(--spacing-md);
+  border-radius: var(--radius-sm);
+  margin-top: var(--spacing-md);
+}
+
+.noteParagraph {
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.noteParagraph:last-child {
+  margin-bottom: 0;
+}
+
+.tableCard {
+  padding: var(--spacing-md);
+  overflow: hidden;
+}
+
+.tableTitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  margin: 0 calc(var(--spacing-md) * -1);
+  padding: 0 var(--spacing-md);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px;
+}
+
+.table th,
+.table td {
+  padding: var(--spacing-sm);
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+
+.table th {
+  background-color: var(--color-bg);
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-sm);
+}
+
+.rowLabel {
+  background-color: var(--color-bg);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.cell {
+  vertical-align: top;
+}
+
+.thaiButton {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.thaiButton:hover {
+  background-color: var(--color-primary-light);
+}
+
+.thai {
+  display: block;
+  font-family: var(--font-thai);
+  font-size: var(--font-size-lg);
+  color: var(--color-thai);
+  margin-bottom: var(--spacing-xs);
+}
+
+.transcription {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin-bottom: var(--spacing-xs);
+}
+
+.russian {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (min-width: 768px) {
+  .tableCard {
+    padding: var(--spacing-lg);
+  }
+
+  .table th,
+  .table td {
+    padding: var(--spacing-md);
+  }
+
+  .thai {
+    font-size: var(--font-size-xl);
+  }
+}

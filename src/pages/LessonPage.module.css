@@ -1,0 +1,113 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.notFound {
+  text-align: center;
+  padding: var(--spacing-2xl);
+}
+
+.notFound h1 {
+  margin-bottom: var(--spacing-md);
+}
+
+.notFound a {
+  color: var(--color-primary);
+}
+
+.header {
+  text-align: center;
+  padding: var(--spacing-md) 0;
+}
+
+.lessonNumber {
+  display: inline-block;
+  font-size: var(--font-size-sm);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-medium);
+  background-color: var(--color-primary-light);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-full);
+  margin-bottom: var(--spacing-sm);
+}
+
+.title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-sm);
+}
+
+.description {
+  color: var(--color-text-secondary);
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sectionCard {
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.sectionCard:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.sectionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background-color: var(--color-primary-light);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.sectionInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.sectionTitle {
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.sectionSubtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.chevron {
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.sectionProgress {
+  margin-top: var(--spacing-md);
+}
+
+.actions {
+  margin-top: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .sections {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
