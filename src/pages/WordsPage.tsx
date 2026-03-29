@@ -55,23 +55,62 @@ export function WordsPage() {
   const wordsProgressRef = useRef(wordsProgress);
   wordsProgressRef.current = wordsProgress;
 
-  const lessonWords = useMemo(() => lesson1Words.filter((w) => w.lessonId === id), [id]);
+  // Ref to store the last selected word ID to avoid consecutive repeats
+  const lastWordIdRef = useRef<string | null>(null);
+
+  // Filter out service words (not shown in word exercise)
+  const lessonWords = useMemo(() => 
+    lesson1Words.filter((w) => w.lessonId === id && !w.isService), 
+    [id]
+  );
 
   // Initialize words in Redux
   useEffect(() => {
     dispatch(setWords(lessonWords));
   }, [dispatch, lessonWords]);
 
-  // Restore unlocked words after words are loaded
+  // Restore unlocked words only if:
+  // 1. Words are loaded
+  // 2. No unlocked words for this lesson yet
+  // 3. No progress data exists (first time user)
   useEffect(() => {
-    if (lessonWords.length > 0) {
+    const hasProgressData = Object.keys(wordsProgress).length > 0;
+    
+    console.log('[WordsPage] Check restore:', {
+      lessonWordsLength: lessonWords.length,
+      unlockedWordsLength: unlockedWords.length,
+      hasProgressData,
+      isInitialized
+    });
+    
+    // Only call restoreUnlockedWords if:
+    // - Words are loaded
+    // - No unlocked words yet
+    // - NO progress data (first time user, no localStorage)
+    if (lessonWords.length > 0 && 
+        unlockedWords.length === 0 &&
+        !hasProgressData) {
+      // No progress data from localStorage - initialize with first word
+      console.log('[WordsPage] Calling restoreUnlockedWords (no progress data)');
       dispatch(restoreUnlockedWords());
     }
-  }, [dispatch, lessonWords.length]);
+  }, [dispatch, lessonWords.length, unlockedWords.length, wordsProgress, isInitialized]);
 
-  // Get next word to practice - uses ref to avoid dependency on wordsProgress
+  // Reset initialization flag when lessonId changes
+  useEffect(() => {
+    console.log('[WordsPage] Reset isInitialized for lesson', lessonId);
+    setIsInitialized(false);
+  }, [lessonId]);
+
+  // Get next word to practice - uses ref to avoid dependency issues
   const getNextWord = useCallback(() => {
     const progress = wordsProgressRef.current;
+
+    console.log('[WordsPage] getNextWord:', {
+      unlockedCount: unlockedWords.length,
+      unlockedIds: unlockedWords.map(w => w.id),
+      progressKeys: Object.keys(progress).length
+    });
 
     // Find unlocked words that are not completed
     const incompleteWords = unlockedWords.filter((word: Word) => {
@@ -79,12 +118,23 @@ export function WordsPage() {
       return !wordProgress || !wordProgress.completed;
     });
 
+    console.log('[WordsPage] incompleteWords:', incompleteWords.map(w => w.id));
+
     if (incompleteWords.length === 0) {
       return null; // All words completed
     }
 
+    // Filter out the last selected word to avoid consecutive repeats
+    // But only if there are other options available
+    const availableWords = incompleteWords.filter(
+      (word) => word.id !== lastWordIdRef.current
+    );
+
+    // If filtering left us with no words, use all incomplete words (edge case: only one word left)
+    const candidatePool = availableWords.length > 0 ? availableWords : incompleteWords;
+
     // Prioritize words with lower streaks
-    const sortedWords = [...incompleteWords].sort((a, b) => {
+    const sortedWords = [...candidatePool].sort((a, b) => {
       const progressA = progress[a.id]?.correctStreak || 0;
       const progressB = progress[b.id]?.correctStreak || 0;
       return progressA - progressB;
@@ -97,7 +147,15 @@ export function WordsPage() {
       return streak <= lowestStreak + 1;
     });
 
+    console.log('[WordsPage] candidateWords:', candidateWords.map(w => w.id));
     const selected = shuffle(candidateWords)[0];
+    console.log('[WordsPage] selected:', selected?.id);
+
+    // Store the selected word ID for the next iteration
+    if (selected) {
+      lastWordIdRef.current = selected.id;
+    }
+
     return selected;
   }, [unlockedWords]);
 
@@ -114,28 +172,44 @@ export function WordsPage() {
     const nextWordProgress = wordsProgress[nextWord.id];
     const isReversedForThisQuestion = (nextWordProgress?.correctStreak ?? 0) >= 3;
     setQuestionIsReversed(isReversedForThisQuestion);
-    
+
     setCurrentWord(nextWord);
     setSelectedOption(null);
     setShowResult(false);
 
     // Generate options from unlocked words only
+    // Use russian translation as uniqueness key to avoid duplicate options with same meaning
     const wordOptions = getOptionsWithCorrect(
       unlockedWords,
       nextWord,
       OPTIONS_COUNT,
-      (w) => w.id
+      (w) => w.id,
+      (w) => w.russian
     );
     setOptions(wordOptions);
-  }, [getNextWord, unlockedWords]);
+  }, [getNextWord, unlockedWords, wordsProgress]);
 
-  // Initial setup - only run once
+  // Initial setup - only run once after words are loaded and unlocked words are restored
   useEffect(() => {
-    if (!isInitialized && unlockedWords.length > 0) {
+    const hasProgressData = Object.keys(wordsProgress).length > 0;
+    
+    console.log('[WordsPage] Init check:', {
+      isInitialized,
+      lessonWordsLength: lessonWords.length,
+      unlockedWordsLength: unlockedWords.length,
+      unlockedWords: unlockedWords.map(w => w.id),
+      hasProgressData
+    });
+    // Wait until:
+    // 1. Words are loaded (lessonWords.length > 0)
+    // 2. Unlocked words are restored (unlockedWords.length > 0)
+    // 3. Not already initialized
+    if (!isInitialized && lessonWords.length > 0 && unlockedWords.length > 0) {
+      console.log('[WordsPage] Calling setupQuestion');
       setupQuestion();
       setIsInitialized(true);
     }
-  }, [isInitialized, unlockedWords.length, setupQuestion]);
+  }, [isInitialized, lessonWords.length, unlockedWords.length, setupQuestion, wordsProgress]);
 
   // Get current word progress (for streak display)
   const currentWordProgress = currentWord ? wordsProgress[currentWord.id] : null;

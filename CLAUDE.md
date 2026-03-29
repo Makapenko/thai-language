@@ -207,6 +207,7 @@ interface LessonProgress {
 interface StorageData {
   version: number;                    // Версия схемы данных
   wordProgress: Record<string, WordProgress>;
+  phraseProgress: Record<string, PhraseProgress>;
   lessonProgress: Record<number, LessonProgress>;
   settings: UserSettings;
   lastSync?: number;                  // Для будущей синхронизации
@@ -232,6 +233,21 @@ interface StorageService {
 // Сейчас используем localStorage, потом заменим на API
 export const storage: StorageService = localStorageService;
 ```
+
+---
+
+## Добавление нового типа упражнений
+
+При добавлении нового типа упражнений (например, "Тоны", "Аудирование", "Письмо") следуй инструкции:
+**[docs/PROGRESS_SYSTEM.md](docs/PROGRESS_SYSTEM.md)**
+
+Краткий чеклист:
+1. Создать тип прогресса (например, `ToneProgress`)
+2. Добавить в `StorageData`
+3. Создать Redux Slice с `initializeProgress`
+4. Добавить метод `saveXxxProgress` в `storage.ts`
+5. Добавить синхронизацию в `useStorageSync.ts`
+6. Обновить `DEFAULT_STORAGE`
 
 ## Web Speech API
 

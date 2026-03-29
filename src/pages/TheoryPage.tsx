@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
+import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
+import { useAppDispatch } from '../app/hooks';
+import { updateChapterProgress } from '../features/progress/progressSlice';
 import { lesson1Theory, lesson1Words } from '../data/lesson1';
 import { speakThai } from '../utils/speech';
 import styles from './TheoryPage.module.css';
@@ -20,6 +23,7 @@ const getAudioFile = (thai: string): string | null => {
 export function TheoryPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const id = parseInt(lessonId || '1', 10);
 
   const theory = lesson1Theory;
@@ -29,10 +33,19 @@ export function TheoryPage() {
     speakThai(text, audioFile || undefined);
   };
 
+  // Timer component ID for theory section
+  const timerComponentId = `lesson-${id}-theory`;
+
+  // Handle timer time updates
+  const handleTimeUpdate = (time: number) => {
+    dispatch(updateChapterProgress({ chapterId: timerComponentId, timeSpent: time }));
+  };
+
   return (
     <div className={styles.container}>
       <header className={styles.header}>
         <h1 className={styles.title}>{theory.title}</h1>
+        <UniversalTimer componentId={timerComponentId} onTimeUpdate={handleTimeUpdate} />
       </header>
 
       <section className={styles.content}>
@@ -45,7 +58,7 @@ export function TheoryPage() {
                   {paragraph}
                 </p>
               ))}
-              
+
               {section.example && (
                 <div className={styles.example}>
                   <button
@@ -61,7 +74,7 @@ export function TheoryPage() {
                   <span className={styles.russian}>{section.example.russian}</span>
                 </div>
               )}
-              
+
               {section.table && (
                 <div className={styles.sectionTableWrapper}>
                   <table className={styles.sectionTable}>
@@ -84,7 +97,7 @@ export function TheoryPage() {
                   </table>
                 </div>
               )}
-              
+
               {section.note && (
                 <div className={styles.note}>
                   {section.note.split('\n').map((line, nIndex) => (

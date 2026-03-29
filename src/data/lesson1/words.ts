@@ -119,4 +119,7 @@ export const lesson1Words: Word[] = [
   { id: 'w1-22', thai: 'ไหม', transcription: 'mǎi', russian: '? (вопрос)', category: 'particle', lessonId: 1 },
   { id: 'w1-23', thai: 'ใช่', transcription: 'châi', russian: 'да', category: 'particle', lessonId: 1 },
   { id: 'w1-24', thai: 'ครับ', transcription: 'kráp', russian: '(вежл. муж.)', category: 'particle', lessonId: 1 },
+
+  // Service words (Служебные слова - не показываются в упражнении "Слова")
+  { id: 'w1-112', thai: 'จะไม่', transcription: 'jà-mâi', russian: 'не будет (отрицание будущего)', category: 'particle', lessonId: 1, isService: true },
 ];

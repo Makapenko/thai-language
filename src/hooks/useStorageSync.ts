@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
-import { selectWordsProgress } from '../features/words/wordsSlice';
-import { selectAllLessonProgress, loadProgress } from '../features/progress/progressSlice';
+import { selectWordsProgress, selectDailyWordsProgress, selectUnlockedWords, initializeDailyProgress as initDailyWordsProgress, setUnlockedWords } from '../features/words/wordsSlice';
+import { selectAllLessonProgress, selectSettings, initializeProgress as initProgress, selectDailyProgress as selectDailyReadingProgress } from '../features/progress/progressSlice';
+import { selectPhraseProgress, selectDailyPhrasesProgress, initializeDailyProgress as initDailyPhrasesProgress } from '../features/phrases/phrasesSlice';
 import { storage } from '../features/progress/storage';
+import { initializeProgress as initWordsProgress } from '../features/words/wordsSlice';
+import { initializeProgress as initPhrasesProgress } from '../features/phrases/phrasesSlice';
 
 // Debounce helper
 function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
@@ -13,18 +16,57 @@ function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number):
   }) as T;
 }
 
+/**
+ * Hook for synchronizing Redux state with localStorage
+ * - Loads progress from localStorage on mount
+ * - Saves changes to localStorage with debounce
+ */
 export function useStorageSync() {
   const dispatch = useAppDispatch();
   const wordsProgress = useAppSelector(selectWordsProgress);
   const lessonProgress = useAppSelector(selectAllLessonProgress);
+  const phraseProgress = useAppSelector(selectPhraseProgress);
+  const settings = useAppSelector(selectSettings);
+  const dailyWordsProgress = useAppSelector(selectDailyWordsProgress);
+  const dailyPhrasesProgress = useAppSelector(selectDailyPhrasesProgress);
+  const dailyReadingProgress = useAppSelector(selectDailyReadingProgress);
+  const unlockedWordIds = useAppSelector(selectUnlockedWords);
   const isInitialized = useRef(false);
 
-  // Load progress on mount
+  // Load all progress from localStorage on mount (once)
   useEffect(() => {
     async function loadFromStorage() {
-      const data = await storage.load();
-      dispatch(loadProgress(data));
-      isInitialized.current = true;
+      try {
+        console.log('[useStorageSync] Loading from storage...');
+        const data = await storage.load();
+        console.log('[useStorageSync] Loaded data:', {
+          wordProgressKeys: Object.keys(data.wordProgress || {}).length,
+          unlockedWordIds: data.unlockedWordIds?.length || 0
+        });
+
+        // Initialize all slices with persisted data
+        dispatch(initProgress({
+          ...data,
+          dailyProgress: data.dailyProgress || {},
+        }));
+        dispatch(initWordsProgress(data.wordProgress || {}));
+        dispatch(initPhrasesProgress(data.phraseProgress || {}));
+        dispatch(initDailyWordsProgress(data.dailyWordsProgress || {}));
+        dispatch(initDailyPhrasesProgress(data.dailyPhrasesProgress || {}));
+
+        // Restore unlocked words from localStorage or from progress
+        // Priority: localStorage data > computed from progress
+        if (data.unlockedWordIds && data.unlockedWordIds.length > 0) {
+          console.log('[useStorageSync] Restoring unlockedWordIds from localStorage:', data.unlockedWordIds);
+          dispatch(setUnlockedWords(data.unlockedWordIds));
+        }
+        // Note: If no unlockedWordIds in localStorage, WordsPage will call restoreUnlockedWords
+
+        isInitialized.current = true;
+        console.log('[useStorageSync] Initialization complete');
+      } catch (error) {
+        console.error('Failed to load progress from localStorage:', error);
+      }
     }
     loadFromStorage();
   }, [dispatch]);
@@ -50,4 +92,70 @@ export function useStorageSync() {
 
     save();
   }, [lessonProgress]);
+
+  // Save phrase progress on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.savePhraseProgress(phraseProgress);
+    }, 500);
+
+    save();
+  }, [phraseProgress]);
+
+  // Save settings on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.saveSettings(settings);
+    }, 500);
+
+    save();
+  }, [settings]);
+
+  // Save daily words progress on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.saveDailyWordsProgress(dailyWordsProgress);
+    }, 1000);
+
+    save();
+  }, [dailyWordsProgress]);
+
+  // Save daily phrases progress on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.saveDailyPhrasesProgress(dailyPhrasesProgress);
+    }, 1000);
+
+    save();
+  }, [dailyPhrasesProgress]);
+
+  // Save daily reading progress on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.saveDailyProgress(dailyReadingProgress);
+    }, 1000);
+
+    save();
+  }, [dailyReadingProgress]);
+
+  // Save unlocked word IDs on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.saveUnlockedWordIds(unlockedWordIds);
+    }, 1000);
+
+    save();
+  }, [unlockedWordIds]);
 }

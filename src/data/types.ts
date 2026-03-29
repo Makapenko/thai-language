@@ -10,6 +10,7 @@ export interface Word {
   category: WordCategory;
   lessonId: number;
   audioFile?: string;  // 'words/w1-1.mp3' — path to local audio file
+  isService?: boolean; // true for service words (particles, etc.) not shown in word exercises
 }
 
 // Progress tracking for a single word
@@ -19,6 +20,16 @@ export interface WordProgress {
   isReversed: boolean;       // true = show Thai -> Russian
   completed: boolean;        // true after 4 correct answers
   lastPracticed: number;     // timestamp
+  timesCorrect: number;
+  timesWrong: number;
+}
+
+// Progress tracking for a single phrase
+export interface PhraseProgress {
+  phraseId: string;
+  correctStreak: number;
+  completed: boolean;
+  lastPracticed: number;
   timesCorrect: number;
   timesWrong: number;
 }
@@ -195,6 +206,7 @@ export interface UserSettings {
 export interface StorageData {
   version: number;
   wordProgress: Record<string, WordProgress>;
+  phraseProgress: Record<string, PhraseProgress>;
   lessonProgress: Record<number, LessonProgress>;
   settings: UserSettings;
   lastSync?: number;
@@ -210,6 +222,7 @@ export const DEFAULT_SETTINGS: UserSettings = {
 export const DEFAULT_STORAGE: StorageData = {
   version: 1,
   wordProgress: {},
+  phraseProgress: {},
   lessonProgress: {},
   settings: DEFAULT_SETTINGS,
 };

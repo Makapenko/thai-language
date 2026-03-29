@@ -1,0 +1,261 @@
+.calendar {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-md);
+}
+
+.calendarTitle {
+  font-size: var(--font-size-xl);
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.monthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+}
+
+.monthTitle {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-medium);
+  text-transform: capitalize;
+  margin: 0;
+}
+
+.monthHeader button {
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: pointer;
+  font-size: var(--font-size-lg);
+  color: var(--color-text);
+  transition: background-color var(--transition-fast);
+}
+
+.monthHeader button:hover {
+  background: var(--color-primary-light);
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.weekDay {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs);
+}
+
+.days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--spacing-xs);
+}
+
+.day {
+  aspect-ratio: 1;
+  min-height: 80px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  background: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.day:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.day.hasContent {
+  background: #f0f9ff;
+  border-color: var(--color-primary);
+}
+
+.day.currentDay {
+  border-color: var(--color-success);
+  border-width: 2px;
+}
+
+.day.emptyDay {
+  background: transparent;
+  border: none;
+  cursor: default;
+}
+
+.dayHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--spacing-xs);
+}
+
+.dayHeader h3 {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin: 0;
+  color: var(--color-text);
+}
+
+.dayHeader span {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.dayContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  flex: 1;
+}
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+/* Day Details Modal */
+.dayDetails {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--spacing-md);
+}
+
+.dayDetailsContent {
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.dayDetailsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.dayDetailsTitle {
+  font-size: var(--font-size-lg);
+  margin: 0;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: var(--font-size-xl);
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-xs);
+}
+
+.closeButton:hover {
+  color: var(--color-text);
+}
+
+.daySection {
+  margin-bottom: var(--spacing-lg);
+}
+
+.daySectionTitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-primary);
+}
+
+.lessonItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm);
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.lessonInfo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+}
+
+.lessonName {
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+}
+
+.lessonStats {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xxs);
+}
+
+.statCorrect {
+  color: var(--color-success);
+}
+
+.statWrong {
+  color: var(--color-error);
+}
+
+.statTime {
+  color: var(--color-text-secondary);
+}
+
+.emptyDayMessage {
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: var(--spacing-lg);
+}
+
+@media (max-width: 600px) {
+  .day {
+    min-height: 60px;
+    padding: 2px;
+  }
+
+  .dayHeader h3 {
+    font-size: var(--font-size-xs);
+  }
+
+  .indicator {
+    font-size: 10px;
+  }
+}

@@ -6,10 +6,15 @@
 
 .header {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 .title {
   font-size: var(--font-size-xl);
+  margin-bottom: 0;
 }
 
 .content {

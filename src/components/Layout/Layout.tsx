@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import styles from './Layout.module.css';
 
 interface LayoutProps {
@@ -8,13 +8,15 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
   const isHome = location.pathname === '/';
+  const isCalendar = location.pathname === '/calendar';
 
   return (
     <div className={styles.layout}>
       <header className={styles.header}>
         <div className={styles.headerContent}>
-          {!isHome && (
+          {!isHome && !isCalendar && (
             <Link to="/" className={styles.backLink}>
               <svg
                 width="24"
@@ -34,6 +36,28 @@ export function Layout({ children }: LayoutProps) {
             <span className={styles.logoThai}>ภาษาไทย</span>
             <span className={styles.logoText}>Thai 16</span>
           </Link>
+          <button
+            className={styles.calendarLink}
+            onClick={() => navigate('/calendar')}
+            aria-label="Календарь прогресса"
+            title="Календарь прогресса"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+          </button>
         </div>
       </header>
       <main className={styles.main}>{children}</main>

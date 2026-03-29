@@ -1,27 +1,57 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Phrase, WordGroup, PhraseExercise } from '../../data/types';
+import { getCurrentDate } from '../../utils/dateUtils';
+
+export interface PhraseProgress {
+  phraseId: string;
+  correctStreak: number;
+  completed: boolean;
+  lastPracticed: number;
+  timesCorrect: number;
+  timesWrong: number;
+}
+
+// Daily phrase progress tracking
+export interface DailyPhraseProgress {
+  lessonId: number;
+  correctPhrases: number;
+  wrongPhrases: number;
+  timeSpent: number;
+}
+
+export interface DailyPhrasesData {
+  [date: string]: DailyPhraseProgress[];
+}
 
 interface PhrasesState {
   phrases: Phrase[];
   wordGroups: WordGroup[];
   exercises: PhraseExercise[];
+  progress: Record<string, PhraseProgress>;
   currentPhraseIndex: number;
-  selectedParts: string[];           // Currently selected Thai parts
-  currentGroupIndex: number;         // Which group is currently active
+  selectedParts: string[];
+  currentGroupIndex: number;
   isRetrying: boolean;
   exerciseComplete: boolean;
+  dailyProgress: DailyPhrasesData;
 }
+
+const today = getCurrentDate();
 
 const initialState: PhrasesState = {
   phrases: [],
   wordGroups: [],
   exercises: [],
+  progress: {},
   currentPhraseIndex: 0,
   selectedParts: [],
   currentGroupIndex: 0,
   isRetrying: false,
   exerciseComplete: false,
+  dailyProgress: {
+    [today]: [],
+  },
 };
 
 const phrasesSlice = createSlice({
@@ -30,10 +60,7 @@ const phrasesSlice = createSlice({
   reducers: {
     setPhrases: (state, action: PayloadAction<Phrase[]>) => {
       state.phrases = action.payload;
-      state.exercises = action.payload.map(p => ({
-        phraseId: p.id,
-        status: 'pending',
-      }));
+      state.exercises = []; // Start empty - markers will be added as user answers
       state.currentPhraseIndex = 0;
       state.selectedParts = [];
       state.currentGroupIndex = 0;
@@ -43,6 +70,40 @@ const phrasesSlice = createSlice({
 
     setWordGroups: (state, action: PayloadAction<WordGroup[]>) => {
       state.wordGroups = action.payload;
+    },
+
+    initializeProgress: (state, action: PayloadAction<Record<string, PhraseProgress>>) => {
+      state.progress = action.payload;
+    },
+
+    initializeDailyProgress: (state, action: PayloadAction<DailyPhrasesData>) => {
+      state.dailyProgress = action.payload;
+    },
+
+    updatePhraseProgress: (state, action: PayloadAction<{ phraseId: string; isCorrect: boolean }>) => {
+      const { phraseId, isCorrect } = action.payload;
+      const current = state.progress[phraseId] || {
+        phraseId,
+        correctStreak: 0,
+        completed: false,
+        lastPracticed: Date.now(),
+        timesCorrect: 0,
+        timesWrong: 0,
+      };
+
+      if (isCorrect) {
+        current.correctStreak += 1;
+        current.timesCorrect += 1;
+        if (current.correctStreak >= 3) {
+          current.completed = true;
+        }
+      } else {
+        current.correctStreak = 0;
+        current.timesWrong += 1;
+      }
+
+      current.lastPracticed = Date.now();
+      state.progress[phraseId] = current;
     },
 
     selectPart: (state, action: PayloadAction<string>) => {
@@ -63,33 +124,74 @@ const phrasesSlice = createSlice({
       const userAnswer = state.selectedParts.join('');
       const isCorrect = correctAnswer === userAnswer;
 
-      const exerciseIndex = state.exercises.findIndex(
-        e => e.phraseId === currentPhrase.id
-      );
-
       if (isCorrect) {
-        state.exercises[exerciseIndex].status = 'correct';
+        // Correct answer - add a green marker
+        state.exercises.push({
+          phraseId: currentPhrase.id,
+          status: 'correct',
+        });
         state.isRetrying = false;
-      } else {
-        if (state.isRetrying) {
-          // Second attempt failed - mark as wrong and move on
-          state.exercises[exerciseIndex].status = 'wrong';
-          state.isRetrying = false;
-        } else {
-          // First attempt failed - allow retry
-          state.exercises[exerciseIndex].status = 'retry';
-          state.isRetrying = true;
+
+        // Track daily progress - correct phrase
+        const today = getCurrentDate();
+        if (!state.dailyProgress[today]) {
+          state.dailyProgress[today] = [];
         }
+
+        const existingLessonProgress = state.dailyProgress[today].find(
+          p => p.lessonId === currentPhrase.lessonId
+        );
+
+        if (existingLessonProgress) {
+          existingLessonProgress.correctPhrases += 1;
+        } else {
+          state.dailyProgress[today].push({
+            lessonId: currentPhrase.lessonId,
+            correctPhrases: 1,
+            wrongPhrases: 0,
+            timeSpent: 0,
+          });
+        }
+        console.log(`[Phrases] Correct phrase! Daily progress updated for ${today}:`, state.dailyProgress[today]);
+      } else {
+        // Wrong answer - add a red marker immediately AND allow retry
+        state.exercises.push({
+          phraseId: currentPhrase.id,
+          status: 'wrong',
+        });
+        state.isRetrying = true;
+
+        // Track daily progress - wrong phrase
+        const today = getCurrentDate();
+        if (!state.dailyProgress[today]) {
+          state.dailyProgress[today] = [];
+        }
+
+        const existingLessonProgress = state.dailyProgress[today].find(
+          p => p.lessonId === currentPhrase.lessonId
+        );
+
+        if (existingLessonProgress) {
+          existingLessonProgress.wrongPhrases += 1;
+        } else {
+          state.dailyProgress[today].push({
+            lessonId: currentPhrase.lessonId,
+            correctPhrases: 0,
+            wrongPhrases: 1,
+            timeSpent: 0,
+          });
+        }
+        console.log(`[Phrases] Wrong phrase! Daily progress updated for ${today}:`, state.dailyProgress[today]);
       }
     },
 
     nextPhrase: (state) => {
       state.selectedParts = [];
       state.currentGroupIndex = 0;
+      state.isRetrying = false;
 
       if (state.currentPhraseIndex < state.phrases.length - 1) {
         state.currentPhraseIndex += 1;
-        state.isRetrying = false;
       } else {
         state.exerciseComplete = true;
       }
@@ -103,15 +205,36 @@ const phrasesSlice = createSlice({
     },
 
     resetPhrasesExercise: (state) => {
-      state.exercises = state.phrases.map(p => ({
-        phraseId: p.id,
-        status: 'pending',
-      }));
+      state.exercises = []; // Reset to empty
       state.currentPhraseIndex = 0;
       state.selectedParts = [];
       state.currentGroupIndex = 0;
       state.isRetrying = false;
       state.exerciseComplete = false;
+    },
+
+    updatePhrasesTimeSpent: (state, action: PayloadAction<{ lessonId: number; seconds: number }>) => {
+      const { lessonId, seconds } = action.payload;
+      const today = getCurrentDate();
+
+      if (!state.dailyProgress[today]) {
+        state.dailyProgress[today] = [];
+      }
+
+      const existingLessonProgress = state.dailyProgress[today].find(
+        p => p.lessonId === lessonId
+      );
+
+      if (existingLessonProgress) {
+        existingLessonProgress.timeSpent = seconds;
+      } else {
+        state.dailyProgress[today].push({
+          lessonId,
+          correctPhrases: 0,
+          wrongPhrases: 0,
+          timeSpent: seconds,
+        });
+      }
     },
   },
 });
@@ -119,12 +242,16 @@ const phrasesSlice = createSlice({
 export const {
   setPhrases,
   setWordGroups,
+  initializeProgress,
+  initializeDailyProgress,
+  updatePhraseProgress,
   selectPart,
   clearSelectedParts,
   submitPhrase,
   nextPhrase,
   goToPhrase,
   resetPhrasesExercise,
+  updatePhrasesTimeSpent,
 } = phrasesSlice.actions;
 
 export default phrasesSlice.reducer;
@@ -149,6 +276,33 @@ export const selectPhrasesStats = (state: { phrases: PhrasesState }) => {
     total: exercises.length,
     correct: exercises.filter(e => e.status === 'correct').length,
     wrong: exercises.filter(e => e.status === 'wrong').length,
-    pending: exercises.filter(e => e.status === 'pending' || e.status === 'retry').length,
   };
 };
+
+export const selectPhraseProgress = createSelector(
+  (state: { phrases: PhrasesState }) => state.phrases.progress,
+  (progress) => progress
+);
+
+export const selectPhraseProgressByLesson = (lessonId: number) => createSelector(
+  [(state: { phrases: PhrasesState }) => state.phrases.phrases, (state: { phrases: PhrasesState }) => state.phrases.progress],
+  (phrases, progress) => {
+    const phrasesInLesson = phrases.filter((p: Phrase) => p.lessonId === lessonId);
+    const phraseIds = new Set(phrasesInLesson.map((p: Phrase) => p.id));
+    return Object.values(progress).filter(p => phraseIds.has(p.phraseId));
+  }
+);
+
+export const selectDailyPhrasesProgress = (state: { phrases: PhrasesState }) =>
+  state.phrases.dailyProgress;
+
+export const selectTodayPhrasesProgress = createSelector(
+  [(state: { phrases: PhrasesState }) => state.phrases.dailyProgress],
+  (dailyProgress) => {
+    const today = getCurrentDate();
+    return dailyProgress[today] || [];
+  }
+);
+
+export const selectPhrasesProgressByDate = (date: string) => (state: { phrases: PhrasesState }) =>
+  state.phrases.dailyProgress[date] || [];

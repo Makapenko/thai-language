@@ -15,14 +15,25 @@ export function getRandomItems<T>(array: T[], count: number): T[] {
 }
 
 // Get random items excluding specific item, then include it
+// Optionally filter by uniqueness using a uniqueness key function
 export function getOptionsWithCorrect<T>(
   allItems: T[],
   correctItem: T,
   totalCount: number,
-  keyFn: (item: T) => string
+  keyFn: (item: T) => string,
+  uniquenessFn?: (item: T) => string
 ): T[] {
   const correctKey = keyFn(correctItem);
-  const otherItems = allItems.filter((item) => keyFn(item) !== correctKey);
+  const correctUniqueness = uniquenessFn ? uniquenessFn(correctItem) : correctKey;
+  
+  // Filter out the correct item from others
+  let otherItems = allItems.filter((item) => keyFn(item) !== correctKey);
+  
+  // If uniquenessFn is provided, also filter out items with same uniqueness value
+  if (uniquenessFn) {
+    otherItems = otherItems.filter((item) => uniquenessFn(item) !== correctUniqueness);
+  }
+  
   const randomOthers = getRandomItems(otherItems, totalCount - 1);
   return shuffle([correctItem, ...randomOthers]);
 }

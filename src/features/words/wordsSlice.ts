@@ -1,6 +1,18 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createSelector } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { Word, WordProgress } from '../../data/types';
+import { getCurrentDate } from '../../utils/dateUtils';
+
+// Daily word progress tracking
+export interface DailyWordProgress {
+  lessonId: number;
+  wordsLearned: number; // Words reached level 4 (completed)
+  timeSpent: number;
+}
+
+export interface DailyWordsData {
+  [date: string]: DailyWordProgress[];
+}
 
 interface WordsState {
   words: Word[];
@@ -8,8 +20,11 @@ interface WordsState {
   currentWordId: string | null;
   isReversedMode: boolean;
   exerciseComplete: boolean;
-  unlockedWordIds: string[]; // IDs of words that are currently unlocked for practice
+  unlockedWordIds: string[];
+  dailyProgress: DailyWordsData;
 }
+
+const today = getCurrentDate();
 
 const initialState: WordsState = {
   words: [],
@@ -18,6 +33,9 @@ const initialState: WordsState = {
   isReversedMode: false,
   exerciseComplete: false,
   unlockedWordIds: [],
+  dailyProgress: {
+    [today]: [],
+  },
 };
 
 const wordsSlice = createSlice({
@@ -27,6 +45,55 @@ const wordsSlice = createSlice({
     setWords: (state, action: PayloadAction<Word[]>) => {
       state.words = action.payload;
       state.exerciseComplete = false;
+    },
+
+    initializeProgress: (state, action: PayloadAction<Record<string, WordProgress>>) => {
+      state.progress = action.payload;
+      // Note: unlockedWordIds will be restored after words are loaded
+      // via restoreUnlockedWords action
+    },
+
+    initializeDailyProgress: (state, action: PayloadAction<DailyWordsData>) => {
+      state.dailyProgress = action.payload;
+    },
+
+    restoreUnlockedWords: (state) => {
+      if (state.words.length === 0) return;
+
+      // Don't overwrite if unlockedWordIds already has data (e.g., from localStorage)
+      if (state.unlockedWordIds.length > 0) {
+        // Check if the unlocked words are valid for current words
+        const allWordIds = state.words.map(w => w.id);
+        const hasValidUnlockedWords = state.unlockedWordIds.some(id => allWordIds.includes(id));
+        if (hasValidUnlockedWords) {
+          console.log('[wordsSlice] restoreUnlockedWords: skipping, already has valid unlocked words');
+          return;
+        }
+      }
+
+      const allWordIds = state.words.map(w => w.id);
+
+      // Start with the first word always unlocked
+      const unlockedSet = new Set<string>([allWordIds[0]]);
+
+      // For each word, if it has correctStreak >= 3, unlock the next word
+      for (let i = 0; i < allWordIds.length - 1; i++) {
+        const wordId = allWordIds[i];
+        const wordProgress = state.progress[wordId];
+
+        // If this word has been practiced and has correctStreak >= 3, unlock the next word
+        if (wordProgress && wordProgress.correctStreak >= 3) {
+          unlockedSet.add(allWordIds[i + 1]);
+        }
+
+        // Also if word is completed, unlock the next word
+        if (wordProgress && wordProgress.completed) {
+          unlockedSet.add(allWordIds[i + 1]);
+        }
+      }
+
+      state.unlockedWordIds = Array.from(unlockedSet);
+      console.log('[wordsSlice] restoreUnlockedWords: set unlockedWordIds to', state.unlockedWordIds);
     },
 
     setProgress: (state, action: PayloadAction<Record<string, WordProgress>>) => {
@@ -49,6 +116,7 @@ const wordsSlice = createSlice({
         timesWrong: 0,
       };
 
+      const wasCompleted = progress.completed;
       progress.correctStreak += 1;
       progress.timesCorrect += 1;
       progress.lastPracticed = Date.now();
@@ -56,7 +124,6 @@ const wordsSlice = createSlice({
       // After 3 correct, switch to reversed mode and unlock next word
       if (progress.correctStreak === 3) {
         progress.isReversed = true;
-        // Unlock the next word
         const allWordIds = state.words.map(w => w.id);
         for (const id of allWordIds) {
           if (!state.unlockedWordIds.includes(id)) {
@@ -66,12 +133,38 @@ const wordsSlice = createSlice({
         }
       }
 
-      // After 4 correct (3 normal + 1 reversed), mark as completed
+      // After 4 correct, mark as completed
       if (progress.correctStreak >= 4) {
         progress.completed = true;
       }
 
       state.progress[wordId] = progress;
+
+      // Track daily progress - word completed today
+      if (!wasCompleted && progress.completed) {
+        const today = getCurrentDate();
+        if (!state.dailyProgress[today]) {
+          state.dailyProgress[today] = [];
+        }
+
+        const word = state.words.find(w => w.id === wordId);
+        if (word) {
+          const existingLessonProgress = state.dailyProgress[today].find(
+            p => p.lessonId === word.lessonId
+          );
+
+          if (existingLessonProgress) {
+            existingLessonProgress.wordsLearned += 1;
+          } else {
+            state.dailyProgress[today].push({
+              lessonId: word.lessonId,
+              wordsLearned: 1,
+              timeSpent: 0,
+            });
+          }
+          console.log(`[Words] Word ${wordId} completed! Daily progress updated for ${today}:`, state.dailyProgress[today]);
+        }
+      }
     },
 
     answerWrong: (state, action: PayloadAction<string>) => {
@@ -112,7 +205,6 @@ const wordsSlice = createSlice({
     },
 
     unlockNextWord: (state) => {
-      // Unlock the next word that hasn't been unlocked yet
       const allWordIds = state.words.map(w => w.id);
       for (const wordId of allWordIds) {
         if (!state.unlockedWordIds.includes(wordId)) {
@@ -121,11 +213,36 @@ const wordsSlice = createSlice({
         }
       }
     },
+
+    updateWordsTimeSpent: (state, action: PayloadAction<{ lessonId: number; seconds: number }>) => {
+      const { lessonId, seconds } = action.payload;
+      const today = getCurrentDate();
+
+      if (!state.dailyProgress[today]) {
+        state.dailyProgress[today] = [];
+      }
+
+      const existingLessonProgress = state.dailyProgress[today].find(
+        p => p.lessonId === lessonId
+      );
+
+      if (existingLessonProgress) {
+        existingLessonProgress.timeSpent = seconds;
+      } else {
+        state.dailyProgress[today].push({
+          lessonId,
+          wordsLearned: 0,
+          timeSpent: seconds,
+        });
+      }
+    },
   },
 });
 
 export const {
   setWords,
+  initializeProgress,
+  initializeDailyProgress,
   setProgress,
   setCurrentWord,
   answerCorrect,
@@ -134,7 +251,14 @@ export const {
   resetWordsProgress,
   setUnlockedWords,
   unlockNextWord,
+  updateWordsTimeSpent,
+  restoreUnlockedWords,
 } = wordsSlice.actions;
+
+export const persistUnlockedWordIds = (ids: string[]) => ({
+  type: 'words/persistUnlockedWordIds',
+  payload: ids,
+});
 
 export default wordsSlice.reducer;
 
@@ -151,29 +275,22 @@ export const selectLessonWordsProgress = (lessonId: number) => (state: { words: 
   const words = state.words.words.filter(w => w.lessonId === lessonId);
   if (words.length === 0) return 0;
 
-  // Total points based on ALL words in the lesson (4 correct answers per word)
   const totalPoints = words.length * 4;
-  
-  // Calculate earned points from all words
   const earnedPoints = words.reduce((sum, word) => {
     const progress = state.words.progress[word.id];
     return sum + (progress?.correctStreak || 0);
   }, 0);
 
-  // Return percentage with one decimal place
   return parseFloat(((earnedPoints / totalPoints) * 100).toFixed(1));
 };
 
-// Check if all words in the lesson are completed
 export const selectLessonWordsComplete = (lessonId: number) => (state: { words: WordsState }) => {
   const words = state.words.words.filter(w => w.lessonId === lessonId);
   if (words.length === 0) return false;
 
-  // Check if all unlocked words are completed
   const unlockedWords = words.filter(w => state.words.unlockedWordIds.includes(w.id));
   if (unlockedWords.length === 0) return false;
 
-  // Check if all words are unlocked and completed
   const allWordsUnlocked = unlockedWords.length === words.length;
   const allCompleted = unlockedWords.every(w => {
     const progress = state.words.progress[w.id];
@@ -183,10 +300,29 @@ export const selectLessonWordsComplete = (lessonId: number) => (state: { words: 
   return allWordsUnlocked && allCompleted;
 };
 
-export const selectUnlockedWords = (state: { words: WordsState }) =>
-  state.words.unlockedWordIds;
+export const selectUnlockedWords = createSelector(
+  (state: { words: WordsState }) => state.words.unlockedWordIds,
+  (unlockedWordIds) => unlockedWordIds
+);
 
-export const selectUnlockedWordsByLesson = (lessonId: number) => (state: { words: WordsState }) => {
-  const words = state.words.words.filter(w => w.lessonId === lessonId);
-  return words.filter(w => state.words.unlockedWordIds.includes(w.id));
-};
+export const selectUnlockedWordsByLesson = (lessonId: number) => createSelector(
+  [(state: { words: WordsState }) => state.words.words, (state: { words: WordsState }) => state.words.unlockedWordIds],
+  (words, unlockedWordIds) => words.filter((w: Word) => w.lessonId === lessonId && unlockedWordIds.includes(w.id))
+);
+
+export const selectDailyWordsProgress = (state: { words: WordsState }) =>
+  state.words.dailyProgress;
+
+export const selectTodayWordsProgress = createSelector(
+  [(state: { words: WordsState }) => state.words.dailyProgress],
+  (dailyProgress) => {
+    const today = getCurrentDate();
+    return dailyProgress[today] || [];
+  }
+);
+
+export const selectWordsProgressByDate = (date: string) => (state: { words: WordsState }) =>
+  state.words.dailyProgress[date] || [];
+
+export const selectWordsProgressByLesson = (_lessonId: number) => (state: { words: WordsState }) =>
+  state.words.dailyProgress;

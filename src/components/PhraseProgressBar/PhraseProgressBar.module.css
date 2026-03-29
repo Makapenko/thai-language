@@ -23,12 +23,8 @@
   transition: background-color var(--transition-fast);
 }
 
-.pending {
+.empty {
   background-color: var(--color-border);
-}
-
-.current {
-  background-color: var(--color-primary);
 }
 
 .correct {

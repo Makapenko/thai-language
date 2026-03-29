@@ -7,6 +7,7 @@ import { LessonPage } from './pages/LessonPage';
 import { TheoryPage } from './pages/TheoryPage';
 import { WordsPage } from './pages/WordsPage';
 import { PhrasesPage } from './pages/PhrasesPage';
+import { CalendarPage } from './pages/CalendarPage';
 import { useStorageSync } from './hooks/useStorageSync';
 import './styles/global.css';
 
@@ -21,6 +22,7 @@ function AppContent() {
         <Route path="/lesson/:lessonId/theory" element={<TheoryPage />} />
         <Route path="/lesson/:lessonId/words" element={<WordsPage />} />
         <Route path="/lesson/:lessonId/phrases" element={<PhrasesPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
       </Routes>
     </Layout>
   );

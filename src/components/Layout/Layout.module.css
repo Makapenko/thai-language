@@ -40,6 +40,7 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-sm);
+  flex: 1;
 }
 
 .logoThai {
@@ -52,6 +53,24 @@
   font-weight: var(--font-weight-bold);
   font-size: var(--font-size-lg);
   color: var(--color-text);
+}
+
+.calendarLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background-color var(--transition-fast);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.calendarLink:hover {
+  background-color: var(--color-bg-hover);
 }
 
 .main {

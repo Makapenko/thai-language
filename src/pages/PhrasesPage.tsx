@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { PhraseProgressBar } from '../components/PhraseProgressBar';
+import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { lesson1Phrases, lesson1WordGroups } from '../data/lesson1';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
@@ -19,9 +20,11 @@ import {
   selectCurrentPhraseIndex,
   selectIsRetrying,
   selectPhrasesExerciseComplete,
+  updatePhrasesTimeSpent,
 } from '../features/phrases/phrasesSlice';
 import { speakThai, speakThaiPhrase } from '../utils/speech';
 import { shuffle } from '../utils/shuffle';
+import { lesson1Words } from '../data/lesson1/words';
 import styles from './PhrasesPage.module.css';
 
 // Статус слова в списке ошибок
@@ -39,9 +42,8 @@ const OPTIONS_PER_GROUP = 4;
 
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
-  const wordOptions = lesson1WordGroups.flatMap(g => g.options);
-  const word = wordOptions.find(w => w.thai === thai);
-  return word ? `w1-${wordOptions.indexOf(word) + 1}` : null;
+  const word = lesson1Words.find(w => w.thai === thai);
+  return word ? word.id : null;
 };
 
 // Get audio file path for a Thai word
@@ -55,6 +57,14 @@ export function PhrasesPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const id = parseInt(lessonId || '1', 10);
+
+  // Timer component ID for phrases section
+  const timerComponentId = `lesson-${id}-phrases`;
+
+  // Handle timer time updates
+  const handleTimeUpdate = useCallback((time: number) => {
+    dispatch(updatePhrasesTimeSpent({ lessonId: id, seconds: time }));
+  }, [dispatch, id]);
 
   const currentPhrase = useAppSelector(selectCurrentPhrase);
   const selectedParts = useAppSelector(selectSelectedParts);
@@ -82,21 +92,15 @@ export function PhrasesPage() {
 
     const options: string[][] = [];
 
-    // Get unique group IDs from phrase structure
-    const groupIds = currentPhrase.structure.map((s) => s.groupId);
-    const uniqueGroupIds = [...new Set(groupIds)];
-
-    // For each unique group, generate options (including correct one)
-    uniqueGroupIds.forEach((groupId) => {
+    // For each position in the structure, generate options
+    // This handles duplicate groupIds (e.g., two 'ending' groups for past questions)
+    currentPhrase.structure.forEach((structItem) => {
+      const groupId = structItem.groupId;
       const group = lesson1WordGroups.find((g) => g.id === groupId);
       if (!group) return;
 
-      // Find the correct answer for this position
-      const correctPart = currentPhrase.structure.find(
-        (s, i) => s.groupId === groupId && uniqueGroupIds.slice(0, i).filter((g) => g === groupId).length === groupIds.slice(0, groupIds.indexOf(groupId)).filter((g) => g === groupId).length
-      );
-
-      if (!correctPart) return;
+      // The correct answer for this position
+      const correctPart = structItem;
 
       // Get other options from the group
       const otherOptions = group.options
@@ -122,19 +126,27 @@ export function PhrasesPage() {
   const handleOptionClick = (thai: string) => {
     if (showResult) return;
 
-    // Speak the word using local audio file
-    const audioFile = getAudioFile(thai);
-    speakThai(thai, audioFile || undefined);
+    // Add the selected part first
     dispatch(selectPart(thai));
+    const newParts = [...selectedParts, thai];
 
-    // Check if phrase is complete
-    if (currentPhrase && selectedParts.length + 1 >= currentPhrase.structure.length) {
+    // Check if phrase is complete - use currentOptions.length instead of structure.length
+    // because structure may have duplicate groupIds (e.g., two 'ending' groups)
+    if (currentPhrase && newParts.length >= currentOptions.length) {
       // Phrase is complete, check answer
-      const newParts = [...selectedParts, thai];
       const correctParts = currentPhrase.structure.map((s) => s.thai);
       const correctAnswer = correctParts.join(' ');
       const userAnswer = newParts.join(' ');
       const correct = correctAnswer === userAnswer;
+
+      console.log('[PhrasesPage] Phrase complete:', {
+        correct,
+        userAnswer,
+        correctAnswer,
+        newPartsLength: newParts.length,
+        currentOptionsLength: currentOptions.length,
+        structureLength: currentPhrase.structure.length,
+      });
 
       setIsCorrect(correct);
       setShowResult(true);
@@ -201,28 +213,37 @@ export function PhrasesPage() {
         });
       }
 
-      // Speak the full phrase using word-by-word playback
-      const phraseAudioFiles = newParts
+      // Speak the full phrase using word-by-word playback (after a short delay)
+      // Use correct parts for audio playback
+      const phraseAudioFiles = correctParts
         .map(part => getAudioFile(part))
         .filter((f): f is string => f !== null);
-      
-      if (phraseAudioFiles.length > 0) {
-        // Use word-by-word playback for phrases
-        speakThaiPhrase(phraseAudioFiles, 300);
-      } else {
-        // Fallback to API if no audio files found
-        speakThai(newParts.join(''));
-      }
+
+      // Short delay before playing the full phrase
+      setTimeout(() => {
+        if (phraseAudioFiles.length > 0) {
+          // Use word-by-word playback for phrases
+          speakThaiPhrase(phraseAudioFiles, 300);
+        } else {
+          // Fallback to API if no audio files found
+          speakThai(correctParts.join(''));
+        }
+      }, 200);
+    } else {
+      // Not the last word - speak it normally
+      const audioFile = getAudioFile(thai);
+      speakThai(thai, audioFile || undefined);
     }
   };
 
   // Handle next
   const handleNext = () => {
     if (isRetrying) {
-      // Reset for retry
+      // Reset for retry - clear selected parts and show options again
       dispatch(clearSelectedParts());
       setShowResult(false);
     } else {
+      // Move to next phrase
       dispatch(nextPhrase());
     }
   };
@@ -305,6 +326,8 @@ export function PhrasesPage() {
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.container}>
+        <UniversalTimer componentId={timerComponentId} onTimeUpdate={handleTimeUpdate} />
+
         <Card variant="elevated" className={styles.questionCard}>
 
           <div className={styles.russian}>{currentPhrase.russian}</div>
@@ -395,7 +418,6 @@ export function PhrasesPage() {
 
         <PhraseProgressBar
           exercises={exercises}
-          currentIndex={currentPhraseIndex}
         />
 
         <div className={styles.navigation}>
