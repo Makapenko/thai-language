@@ -33,6 +33,7 @@ interface PhrasesState {
   selectedParts: string[];
   currentGroupIndex: number;
   isRetrying: boolean;
+  justAdvanced: boolean; // True after second mistake - phrase already advanced
   exerciseComplete: boolean;
   dailyProgress: DailyPhrasesData;
 }
@@ -48,6 +49,7 @@ const initialState: PhrasesState = {
   selectedParts: [],
   currentGroupIndex: 0,
   isRetrying: false,
+  justAdvanced: false,
   exerciseComplete: false,
   dailyProgress: {
     [today]: [],
@@ -65,6 +67,7 @@ const phrasesSlice = createSlice({
       state.selectedParts = [];
       state.currentGroupIndex = 0;
       state.isRetrying = false;
+      state.justAdvanced = false;
       state.exerciseComplete = false;
     },
 
@@ -154,34 +157,49 @@ const phrasesSlice = createSlice({
         }
         console.log(`[Phrases] Correct phrase! Daily progress updated for ${today}:`, state.dailyProgress[today]);
       } else {
-        // Wrong answer - add a red marker immediately AND allow retry
-        state.exercises.push({
-          phraseId: currentPhrase.id,
-          status: 'wrong',
-        });
-        state.isRetrying = true;
-
-        // Track daily progress - wrong phrase
-        const today = getCurrentDate();
-        if (!state.dailyProgress[today]) {
-          state.dailyProgress[today] = [];
-        }
-
-        const existingLessonProgress = state.dailyProgress[today].find(
-          p => p.lessonId === currentPhrase.lessonId
-        );
-
-        if (existingLessonProgress) {
-          existingLessonProgress.wrongPhrases += 1;
+        // Wrong answer
+        if (state.isRetrying) {
+          // Second mistake - don't add another marker, just move to next phrase
+          state.isRetrying = false;
+          state.justAdvanced = true; // Flag: phrase already advanced
+          // Advance to next phrase
+          if (state.currentPhraseIndex < state.phrases.length - 1) {
+            state.currentPhraseIndex += 1;
+          } else {
+            state.exerciseComplete = true;
+          }
+          state.selectedParts = [];
+          state.currentGroupIndex = 0;
         } else {
-          state.dailyProgress[today].push({
-            lessonId: currentPhrase.lessonId,
-            correctPhrases: 0,
-            wrongPhrases: 1,
-            timeSpent: 0,
+          // First mistake - add a red marker and allow retry
+          state.exercises.push({
+            phraseId: currentPhrase.id,
+            status: 'wrong',
           });
+          state.isRetrying = true;
+
+          // Track daily progress - wrong phrase
+          const today = getCurrentDate();
+          if (!state.dailyProgress[today]) {
+            state.dailyProgress[today] = [];
+          }
+
+          const existingLessonProgress = state.dailyProgress[today].find(
+            p => p.lessonId === currentPhrase.lessonId
+          );
+
+          if (existingLessonProgress) {
+            existingLessonProgress.wrongPhrases += 1;
+          } else {
+            state.dailyProgress[today].push({
+              lessonId: currentPhrase.lessonId,
+              correctPhrases: 0,
+              wrongPhrases: 1,
+              timeSpent: 0,
+            });
+          }
+          console.log(`[Phrases] Wrong phrase! Daily progress updated for ${today}:`, state.dailyProgress[today]);
         }
-        console.log(`[Phrases] Wrong phrase! Daily progress updated for ${today}:`, state.dailyProgress[today]);
       }
     },
 
@@ -189,6 +207,7 @@ const phrasesSlice = createSlice({
       state.selectedParts = [];
       state.currentGroupIndex = 0;
       state.isRetrying = false;
+      state.justAdvanced = false;
 
       if (state.currentPhraseIndex < state.phrases.length - 1) {
         state.currentPhraseIndex += 1;
@@ -202,6 +221,7 @@ const phrasesSlice = createSlice({
       state.selectedParts = [];
       state.currentGroupIndex = 0;
       state.isRetrying = false;
+      state.justAdvanced = false;
     },
 
     resetPhrasesExercise: (state) => {
@@ -210,6 +230,7 @@ const phrasesSlice = createSlice({
       state.selectedParts = [];
       state.currentGroupIndex = 0;
       state.isRetrying = false;
+      state.justAdvanced = false;
       state.exerciseComplete = false;
     },
 
@@ -264,6 +285,7 @@ export const selectCurrentPhraseIndex = (state: { phrases: PhrasesState }) => st
 export const selectSelectedParts = (state: { phrases: PhrasesState }) => state.phrases.selectedParts;
 export const selectCurrentGroupIndex = (state: { phrases: PhrasesState }) => state.phrases.currentGroupIndex;
 export const selectIsRetrying = (state: { phrases: PhrasesState }) => state.phrases.isRetrying;
+export const selectJustAdvanced = (state: { phrases: PhrasesState }) => state.phrases.justAdvanced;
 export const selectPhrasesExerciseComplete = (state: { phrases: PhrasesState }) => state.phrases.exerciseComplete;
 
 export const selectCurrentPhrase = (state: { phrases: PhrasesState }) => {

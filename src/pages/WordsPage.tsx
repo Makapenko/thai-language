@@ -16,6 +16,7 @@ import {
   selectLessonWordsComplete,
   updateWordsTimeSpent,
   restoreUnlockedWords,
+  resetWordsProgress,
 } from '../features/words/wordsSlice';
 import { speakThai } from '../utils/speech';
 import { getOptionsWithCorrect, shuffle } from '../utils/shuffle';
@@ -250,6 +251,13 @@ export function WordsPage() {
     setupQuestion();
   };
 
+  // Handle reset progress
+  const handleReset = () => {
+    dispatch(resetWordsProgress(id));
+    dispatch(restoreUnlockedWords());
+    setIsInitialized(false);
+  };
+
   // Handle speak button
   const handleSpeak = (text: string, audioFile: string) => {
     speakThai(text, audioFile);
@@ -280,6 +288,12 @@ export function WordsPage() {
             Вы выучили все слова этого урока
           </p>
           <div className={styles.completeActions}>
+            <Button
+              variant="secondary"
+              onClick={handleReset}
+            >
+              Учить заново
+            </Button>
             <Button
               variant="secondary"
               onClick={() => navigate(`/lesson/${id}`)}
@@ -324,6 +338,12 @@ export function WordsPage() {
                   Вы выучили все слова этого урока
                 </p>
                 <div className={styles.completeActions}>
+                  <Button
+                    variant="secondary"
+                    onClick={handleReset}
+                  >
+                    Учить заново
+                  </Button>
                   <Button
                     variant="secondary"
                     onClick={() => navigate(`/lesson/${id}`)}

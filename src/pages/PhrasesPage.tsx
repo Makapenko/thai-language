@@ -19,6 +19,7 @@ import {
   selectExercises,
   selectCurrentPhraseIndex,
   selectIsRetrying,
+  selectJustAdvanced,
   selectPhrasesExerciseComplete,
   updatePhrasesTimeSpent,
 } from '../features/phrases/phrasesSlice';
@@ -72,6 +73,7 @@ export function PhrasesPage() {
   const exercises = useAppSelector(selectExercises);
   const currentPhraseIndex = useAppSelector(selectCurrentPhraseIndex);
   const isRetrying = useAppSelector(selectIsRetrying);
+  const justAdvanced = useAppSelector(selectJustAdvanced);
   const isComplete = useAppSelector(selectPhrasesExerciseComplete);
 
   const [showResult, setShowResult] = useState(false);
@@ -238,12 +240,16 @@ export function PhrasesPage() {
 
   // Handle next
   const handleNext = () => {
-    if (isRetrying) {
-      // Reset for retry - clear selected parts and show options again
+    if (justAdvanced) {
+      // Second mistake - phrase already advanced, just reset UI
+      dispatch(clearSelectedParts());
+      setShowResult(false);
+    } else if (isRetrying) {
+      // First mistake retry - reset UI for another attempt
       dispatch(clearSelectedParts());
       setShowResult(false);
     } else {
-      // Move to next phrase
+      // Correct on first try - move to next phrase
       dispatch(nextPhrase());
     }
   };
