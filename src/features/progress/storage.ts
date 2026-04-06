@@ -12,6 +12,7 @@ export interface ExtendedStorageData extends StorageData {
   dailyPhrasesProgress?: DailyPhrasesData;
   dailyProgress?: DailyProgress;
   unlockedWordIds?: string[];
+  favorites?: string[];
 }
 
 // Storage interface for future API migration
@@ -26,6 +27,7 @@ export interface StorageService {
   saveDailyPhrasesProgress(progress: DailyPhrasesData): Promise<void>;
   saveDailyProgress(progress: DailyProgress): Promise<void>;
   saveUnlockedWordIds(ids: string[]): Promise<void>;
+  saveFavorites(ids: string[]): Promise<void>;
   clear(): Promise<void>;
   reset(): Promise<void>;
 }
@@ -57,6 +59,11 @@ class LocalStorageService implements StorageService {
   private migrateData(data: ExtendedStorageData): ExtendedStorageData {
     if (!data.version) {
       data.version = 1;
+    }
+
+    // Add favorites if not present
+    if (!data.favorites) {
+      data.favorites = [];
     }
 
     return {
@@ -129,6 +136,10 @@ class LocalStorageService implements StorageService {
 
   async saveUnlockedWordIds(ids: string[]): Promise<void> {
     await this.save({ unlockedWordIds: ids });
+  }
+
+  async saveFavorites(ids: string[]): Promise<void> {
+    await this.save({ favorites: ids });
   }
 
   async clear(): Promise<void> {

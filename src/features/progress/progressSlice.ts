@@ -17,9 +17,29 @@ export interface ActivityProgress {
   completedAt?: string;
 }
 
+// Test result
+export interface TestResult {
+  activityId: string;
+  score: number;
+  maxScore: number;
+  completedAt: string;
+  content?: Record<string, any>;
+}
+
+// Exercise entry
+export interface ExerciseEntry {
+  activityId: string;
+  completedAt: string;
+  timeSpent?: number;
+  score?: number;
+  content?: Record<string, any>;
+}
+
 export interface DayProgress {
   chapters: Record<string, ChapterProgress>;
   activities: Record<string, ActivityProgress>;
+  testResults: TestResult[];
+  exercises: ExerciseEntry[];
 }
 
 export interface DailyProgress {
@@ -31,6 +51,7 @@ interface ProgressState {
   settings: UserSettings;
   isLoaded: boolean;
   dailyProgress: DailyProgress;
+  favorites: string[]; // Array of activity IDs
 }
 
 const today = getCurrentDate();
@@ -38,6 +59,8 @@ const today = getCurrentDate();
 const createEmptyDayProgress = (): DayProgress => ({
   chapters: {},
   activities: {},
+  testResults: [],
+  exercises: [],
 });
 
 const initialState: ProgressState = {
@@ -51,6 +74,7 @@ const initialState: ProgressState = {
   dailyProgress: {
     [today]: createEmptyDayProgress(),
   },
+  favorites: [],
 };
 
 const progressSlice = createSlice({
@@ -60,17 +84,18 @@ const progressSlice = createSlice({
     /**
      * Initialize progress from localStorage on app start
      */
-    initializeProgress: (state, action: PayloadAction<StorageData & { dailyProgress?: DailyProgress }>) => {
+    initializeProgress: (state, action: PayloadAction<StorageData & { dailyProgress?: DailyProgress; favorites?: string[] }>) => {
       state.lessonProgress = action.payload.lessonProgress || {};
       state.settings = action.payload.settings || initialState.settings;
       state.dailyProgress = action.payload.dailyProgress || { [today]: createEmptyDayProgress() };
+      state.favorites = action.payload.favorites || [];
       state.isLoaded = true;
     },
 
     /**
      * Load partial progress data (for migrations or updates)
      */
-    loadProgress: (state, action: PayloadAction<Partial<StorageData> & { dailyProgress?: DailyProgress }>) => {
+    loadProgress: (state, action: PayloadAction<Partial<StorageData> & { dailyProgress?: DailyProgress; favorites?: string[] }>) => {
       if (action.payload.lessonProgress) {
         state.lessonProgress = {
           ...state.lessonProgress,
@@ -85,6 +110,9 @@ const progressSlice = createSlice({
           ...state.dailyProgress,
           ...action.payload.dailyProgress,
         };
+      }
+      if (action.payload.favorites) {
+        state.favorites = action.payload.favorites;
       }
       state.isLoaded = true;
     },
@@ -167,10 +195,11 @@ const progressSlice = createSlice({
         state.dailyProgress[currentDate] = createEmptyDayProgress();
       }
 
+      const existing = state.dailyProgress[currentDate].activities[activityId];
       state.dailyProgress[currentDate].activities[activityId] = {
         id: activityId,
-        timeSpent,
-        completedAt: timeSpent > 0 ? getCurrentISOTimestamp() : undefined,
+        timeSpent: (existing?.timeSpent || 0) + timeSpent,
+        completedAt: getCurrentISOTimestamp(),
       };
     },
 
@@ -196,6 +225,54 @@ const progressSlice = createSlice({
         completedAt: getCurrentISOTimestamp(),
       };
     },
+
+    /**
+     * Save test result
+     */
+    saveTestResult: (state, action: PayloadAction<TestResult>) => {
+      const testResult = action.payload;
+      const currentDate = getCurrentDate();
+
+      if (!state.dailyProgress[currentDate]) {
+        state.dailyProgress[currentDate] = createEmptyDayProgress();
+      }
+
+      state.dailyProgress[currentDate].testResults.push(testResult);
+    },
+
+    /**
+     * Save exercise entry
+     */
+    saveExercise: (state, action: PayloadAction<ExerciseEntry>) => {
+      const exercise = action.payload;
+      const currentDate = getCurrentDate();
+
+      if (!state.dailyProgress[currentDate]) {
+        state.dailyProgress[currentDate] = createEmptyDayProgress();
+      }
+
+      state.dailyProgress[currentDate].exercises.push(exercise);
+    },
+
+    /**
+     * Toggle favorite
+     */
+    toggleFavorite: (state, action: PayloadAction<string>) => {
+      const activityId = action.payload;
+      const index = state.favorites.indexOf(activityId);
+      if (index >= 0) {
+        state.favorites.splice(index, 1);
+      } else {
+        state.favorites.push(activityId);
+      }
+    },
+
+    /**
+     * Set favorites
+     */
+    setFavorites: (state, action: PayloadAction<string[]>) => {
+      state.favorites = action.payload;
+    },
   },
 });
 
@@ -211,6 +288,10 @@ export const {
   updateChapterProgress,
   updateActivityProgress,
   completeChapter,
+  saveTestResult,
+  saveExercise,
+  toggleFavorite,
+  setFavorites,
 } = progressSlice.actions;
 
 export default progressSlice.reducer;
@@ -261,6 +342,27 @@ export const selectTodayChaptersProgress = createSelector(
   }
 );
 
+export const selectTodayTestResults = createSelector(
+  [(state: { progress: ProgressState }) => state.progress.dailyProgress],
+  (dailyProgress) => {
+    const today = getCurrentDate();
+    return dailyProgress[today]?.testResults || [];
+  }
+);
+
+export const selectTodayExercises = createSelector(
+  [(state: { progress: ProgressState }) => state.progress.dailyProgress],
+  (dailyProgress) => {
+    const today = getCurrentDate();
+    return dailyProgress[today]?.exercises || [];
+  }
+);
+
+export const selectFavorites = createSelector(
+  (state: { progress: ProgressState }) => state.progress.favorites,
+  (favorites) => favorites
+);
+
 export const selectTimeSpentByActivity = createSelector(
   [(state: { progress: ProgressState }) => state.progress.dailyProgress],
   (dailyProgress) => {
@@ -296,5 +398,60 @@ export const selectTimeSpentByChapter = createSelector(
     });
 
     return result;
+  }
+);
+
+// Get test results by activity ID (all time)
+export const selectTestResultsByType = (activityId: string) =>
+  createSelector(
+    [(state: { progress: ProgressState }) => state.progress.dailyProgress],
+    (dailyProgress) => {
+      const results: TestResult[] = [];
+      Object.values(dailyProgress).forEach((dayProgress: DayProgress) => {
+        if (dayProgress.testResults) {
+          dayProgress.testResults.forEach((result) => {
+            if (result.activityId === activityId) {
+              results.push(result);
+            }
+          });
+        }
+      });
+      // Sort by date descending (most recent first)
+      return results.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+    }
+  );
+
+// Get exercises by activity ID (all time)
+export const selectExercisesByType = (activityId: string) =>
+  createSelector(
+    [(state: { progress: ProgressState }) => state.progress.dailyProgress],
+    (dailyProgress) => {
+      const exercises: ExerciseEntry[] = [];
+      Object.values(dailyProgress).forEach((dayProgress: DayProgress) => {
+        if (dayProgress.exercises) {
+          dayProgress.exercises.forEach((exercise) => {
+            if (exercise.activityId === activityId) {
+              exercises.push(exercise);
+            }
+          });
+        }
+      });
+      // Sort by date descending (most recent first)
+      return exercises.sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime());
+    }
+  );
+
+// Get last 7 days of progress for history bar
+export const selectLast7DaysProgress = createSelector(
+  [(state: { progress: ProgressState }) => state.progress.dailyProgress],
+  (dailyProgress) => {
+    const days: DayProgress[] = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date();
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      days.push(dailyProgress[dateStr] || createEmptyDayProgress());
+    }
+    return days;
   }
 );

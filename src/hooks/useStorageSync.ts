@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
 import { useAppSelector, useAppDispatch } from '../app/hooks';
 import { selectWordsProgress, selectDailyWordsProgress, selectUnlockedWords, initializeDailyProgress as initDailyWordsProgress, setUnlockedWords } from '../features/words/wordsSlice';
-import { selectAllLessonProgress, selectSettings, initializeProgress as initProgress, selectDailyProgress as selectDailyReadingProgress } from '../features/progress/progressSlice';
+import { selectAllLessonProgress, selectSettings, initializeProgress as initProgress, selectDailyProgress as selectDailyReadingProgress, selectFavorites } from '../features/progress/progressSlice';
 import { selectPhraseProgress, selectDailyPhrasesProgress, initializeDailyProgress as initDailyPhrasesProgress } from '../features/phrases/phrasesSlice';
 import { storage } from '../features/progress/storage';
 import { initializeProgress as initWordsProgress } from '../features/words/wordsSlice';
 import { initializeProgress as initPhrasesProgress } from '../features/phrases/phrasesSlice';
+import { setFavorites } from '../features/progress/progressSlice';
 
 // Debounce helper
 function debounce<T extends (...args: unknown[]) => void>(fn: T, delay: number): T {
@@ -31,6 +32,7 @@ export function useStorageSync() {
   const dailyPhrasesProgress = useAppSelector(selectDailyPhrasesProgress);
   const dailyReadingProgress = useAppSelector(selectDailyReadingProgress);
   const unlockedWordIds = useAppSelector(selectUnlockedWords);
+  const favorites = useAppSelector(selectFavorites);
   const isInitialized = useRef(false);
 
   // Load all progress from localStorage on mount (once)
@@ -48,11 +50,18 @@ export function useStorageSync() {
         dispatch(initProgress({
           ...data,
           dailyProgress: data.dailyProgress || {},
+          favorites: data.favorites || [],
         }));
         dispatch(initWordsProgress(data.wordProgress || {}));
         dispatch(initPhrasesProgress(data.phraseProgress || {}));
         dispatch(initDailyWordsProgress(data.dailyWordsProgress || {}));
         dispatch(initDailyPhrasesProgress(data.dailyPhrasesProgress || {}));
+
+        // Restore favorites from localStorage
+        if (data.favorites && data.favorites.length > 0) {
+          console.log('[useStorageSync] Restoring favorites from localStorage:', data.favorites);
+          dispatch(setFavorites(data.favorites));
+        }
 
         // Restore unlocked words from localStorage or from progress
         // Priority: localStorage data > computed from progress
@@ -158,4 +167,15 @@ export function useStorageSync() {
 
     save();
   }, [unlockedWordIds]);
+
+  // Save favorites on change
+  useEffect(() => {
+    if (!isInitialized.current) return;
+
+    const save = debounce(async () => {
+      await storage.saveFavorites(favorites);
+    }, 1000);
+
+    save();
+  }, [favorites]);
 }

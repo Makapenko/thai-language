@@ -73,6 +73,12 @@
   background-color: var(--color-bg-hover);
 }
 
+.headerActions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
 .main {
   flex: 1;
   padding: var(--spacing-md) var(--container-padding);
