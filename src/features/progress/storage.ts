@@ -28,6 +28,7 @@ export interface StorageService {
   saveDailyProgress(progress: DailyProgress): Promise<void>;
   saveUnlockedWordIds(ids: string[]): Promise<void>;
   saveFavorites(ids: string[]): Promise<void>;
+  clearWordProgress(): Promise<void>;
   clear(): Promise<void>;
   reset(): Promise<void>;
 }
@@ -140,6 +141,15 @@ class LocalStorageService implements StorageService {
 
   async saveFavorites(ids: string[]): Promise<void> {
     await this.save({ favorites: ids });
+  }
+
+  async clearWordProgress(): Promise<void> {
+    await this.save({
+      wordProgress: {},
+      unlockedWordIds: [],
+    });
+    // Preserve all other data from current storage
+    // dailyWordsProgress, dailyPhrasesProgress, dailyProgress, etc. remain intact
   }
 
   async clear(): Promise<void> {

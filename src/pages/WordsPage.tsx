@@ -17,10 +17,12 @@ import {
   updateWordsTimeSpent,
   restoreUnlockedWords,
   resetWordsProgress,
+  setUnlockedWords,
 } from '../features/words/wordsSlice';
 import { speakThai } from '../utils/speech';
 import { getOptionsWithCorrect, shuffle } from '../utils/shuffle';
 import type { Word } from '../data/types';
+import { storage } from '../features/progress/storage';
 import styles from './WordsPage.module.css';
 
 const OPTIONS_COUNT = 6;
@@ -253,9 +255,17 @@ export function WordsPage() {
 
   // Handle reset progress
   const handleReset = () => {
+    // Reset progress for this specific lesson in Redux
     dispatch(resetWordsProgress(id));
+    // Clear unlockedWordIds so restoreUnlockedWords will recalculate
+    dispatch(setUnlockedWords([]));
+    // Restore unlocked words (will unlock only first word since progress is cleared)
     dispatch(restoreUnlockedWords());
     setIsInitialized(false);
+
+    // Clear localStorage to prevent restoration of old progress on reload
+    // This only clears wordProgress and unlockedWordIds, preserving daily statistics
+    storage.clearWordProgress();
   };
 
   // Handle speak button

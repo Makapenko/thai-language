@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { PhraseProgressBar } from '../components/PhraseProgressBar';
+import { TheoryModal } from '../components/TheoryModal/TheoryModal';
 import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { lesson1Phrases, lesson1WordGroups } from '../data/lesson1';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
@@ -80,6 +81,7 @@ export function PhrasesPage() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [currentOptions, setCurrentOptions] = useState<string[][]>([]);
   const [wrongWords, setWrongWords] = useState<WrongWord[]>([]);
+  const [showTheoryModal, setShowTheoryModal] = useState(false);
 
   // Initialize phrases
   useEffect(() => {
@@ -430,6 +432,16 @@ export function PhrasesPage() {
           <Button variant="ghost" onClick={() => navigate(`/lesson/${id}`)}>
             Выйти
           </Button>
+          <button
+            className={styles.theoryButton}
+            onClick={() => setShowTheoryModal(true)}
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+              <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+            </svg>
+            Шпаргалка
+          </button>
         </div>
       </div>
 
@@ -463,6 +475,12 @@ export function PhrasesPage() {
           </div>
         </aside>
       )}
+
+      {/* Модальное окно с теорией */}
+      <TheoryModal
+        isOpen={showTheoryModal}
+        onClose={() => setShowTheoryModal(false)}
+      />
     </div>
   );
 }
