@@ -19,7 +19,8 @@ const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 interface LessonDayProgress {
   lessonId: number;
   wordsLearned?: number;
-  timeSpent?: number;
+  wordsTimeSpent?: number;
+  phrasesTimeSpent?: number;
   correctPhrases?: number;
   wrongPhrases?: number;
 }
@@ -51,9 +52,12 @@ const ProgressCalendar: React.FC = () => {
         const existingLesson = processed[date].lessons.find(l => l.lessonId === lesson.lessonId);
         if (existingLesson) {
           existingLesson.wordsLearned = (existingLesson.wordsLearned || 0) + lesson.wordsLearned;
-          existingLesson.timeSpent = (existingLesson.timeSpent || 0) + lesson.timeSpent;
+          existingLesson.wordsTimeSpent = (existingLesson.wordsTimeSpent || 0) + lesson.timeSpent;
         } else {
-          processed[date].lessons.push({ ...lesson });
+          processed[date].lessons.push({
+            ...lesson,
+            wordsTimeSpent: lesson.timeSpent,
+          });
         }
       });
     });
@@ -68,9 +72,12 @@ const ProgressCalendar: React.FC = () => {
         if (existingLesson) {
           existingLesson.correctPhrases = (existingLesson.correctPhrases || 0) + lesson.correctPhrases;
           existingLesson.wrongPhrases = (existingLesson.wrongPhrases || 0) + lesson.wrongPhrases;
-          existingLesson.timeSpent = (existingLesson.timeSpent || 0) + lesson.timeSpent;
+          existingLesson.phrasesTimeSpent = (existingLesson.phrasesTimeSpent || 0) + lesson.timeSpent;
         } else {
-          processed[date].lessons.push({ ...lesson });
+          processed[date].lessons.push({
+            ...lesson,
+            phrasesTimeSpent: lesson.timeSpent,
+          });
         }
       });
     });

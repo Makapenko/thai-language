@@ -247,6 +247,7 @@ const phrasesSlice = createSlice({
       );
 
       if (existingLessonProgress) {
+        // Timer already accumulates time, so we just update with the current value
         existingLessonProgress.timeSpent = seconds;
       } else {
         state.dailyProgress[today].push({

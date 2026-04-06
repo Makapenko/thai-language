@@ -138,22 +138,47 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: var(--spacing-md);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .dayDetailsContent {
-  background: var(--color-bg-secondary);
+  background: var(--color-bg);
   border-radius: var(--radius-lg);
   padding: var(--spacing-lg);
   max-width: 500px;
   width: 100%;
   max-height: 80vh;
   overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  animation: slideUp 0.3s ease-out;
+  border: 1px solid var(--color-border);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 .dayDetailsHeader {
@@ -169,20 +194,38 @@
 }
 
 .closeButton {
-  background: none;
-  border: none;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xl);
   cursor: pointer;
   color: var(--color-text-secondary);
-  padding: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
 }
 
 .closeButton:hover {
   color: var(--color-text);
+  background: var(--color-primary-light);
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+.closeButton:active {
+  transform: scale(0.95);
 }
 
 .daySection {
   margin-bottom: var(--spacing-lg);
+  padding: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
 }
 
 .daySectionTitle {
@@ -194,14 +237,116 @@
   border-bottom: 2px solid var(--color-primary);
 }
 
+/* Tasks List */
+.tasksList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.taskCard {
+  padding: var(--spacing-md);
+  background: var(--color-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-fast);
+}
+
+.taskCard:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.taskHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.taskIcon {
+  font-size: var(--font-size-xl);
+  line-height: 1;
+}
+
+.taskTitle {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text);
+  margin: 0;
+  flex: 1;
+}
+
+.taskStats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xxs);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.statLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.statValue {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.statCorrect .statValue {
+  color: var(--color-success);
+}
+
+.statWrong .statValue {
+  color: var(--color-error);
+}
+
+.taskTime {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  align-self: flex-start;
+}
+
+.timeIcon {
+  font-size: var(--font-size-md);
+}
+
 .lessonItem {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md);
   background: var(--color-bg);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   margin-bottom: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  transition: all var(--transition-fast);
+}
+
+.lessonItem:hover {
+  border-color: var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transform: translateX(2px);
 }
 
 .lessonInfo {
@@ -257,5 +402,32 @@
 
   .indicator {
     font-size: 10px;
+  }
+
+  .dayDetails {
+    padding: var(--spacing-sm);
+  }
+
+  .dayDetailsContent {
+    padding: var(--spacing-md);
+    max-height: 90vh;
+  }
+
+  .dayDetailsTitle {
+    font-size: var(--font-size-md);
+  }
+
+  .taskStats {
+    grid-template-columns: 1fr;
+  }
+
+  .taskHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-xs);
+  }
+
+  .taskTitle {
+    font-size: var(--font-size-sm);
   }
 }
