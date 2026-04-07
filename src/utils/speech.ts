@@ -25,7 +25,9 @@ export async function speakThai(text: string, audioFile?: string, _rate = 0.8): 
   // If local audio file is provided, use it (instant playback)
   if (audioFile) {
     try {
-      currentAudio = new Audio(`/audio/${audioFile}`);
+      const basePath = import.meta.env.VITE_BASE || '/';
+      const audioPath = basePath.endsWith('/') ? basePath : basePath + '/';
+      currentAudio = new Audio(`${audioPath}audio/${audioFile}`);
       await currentAudio.play();
       return;
     } catch (error) {
@@ -113,9 +115,11 @@ export async function speakThaiPhrase(
       }
 
       const audioFile = words[i];
-      
+
       try {
-        currentAudio = new Audio(`/audio/${audioFile}`);
+        const basePath = import.meta.env.VITE_BASE || '/';
+        const audioPath = basePath.endsWith('/') ? basePath : basePath + '/';
+        currentAudio = new Audio(`${audioPath}audio/${audioFile}`);
         await currentAudio.play();
         
         // Wait for the audio to finish

@@ -31,9 +31,10 @@ function AppContent() {
 }
 
 function App() {
+  const basename = import.meta.env.VITE_BASE || '/';
   return (
     <Provider store={store}>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <AppContent />
       </BrowserRouter>
     </Provider>

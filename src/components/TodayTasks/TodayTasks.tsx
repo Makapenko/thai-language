@@ -93,7 +93,8 @@ const TodayTasks: React.FC = () => {
     const firstUnlockedLesson = unlockedContent.chapters[0];
     if (firstUnlockedLesson) {
       const lessonId = firstUnlockedLesson.replace('lesson-', '');
-      window.location.href = `/lesson/${lessonId}/words`;
+      const basePath = import.meta.env.VITE_BASE || '/';
+      window.location.href = `${basePath}lesson/${lessonId}/words`;
     }
   };
 
@@ -102,7 +103,8 @@ const TodayTasks: React.FC = () => {
     const firstUnlockedLesson = unlockedContent.chapters[0];
     if (firstUnlockedLesson) {
       const lessonId = firstUnlockedLesson.replace('lesson-', '');
-      window.location.href = `/lesson/${lessonId}/phrases`;
+      const basePath = import.meta.env.VITE_BASE || '/';
+      window.location.href = `${basePath}lesson/${lessonId}/phrases`;
     }
   };
 
