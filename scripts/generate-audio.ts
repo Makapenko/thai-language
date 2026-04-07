@@ -12,7 +12,7 @@
  * - Google TTS backend may have additional throttling
  */
 
-import { lesson1Words } from '../src/data/lesson1/words.js';
+import { lesson2Words } from '../src/data/lesson2/words.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -60,30 +60,42 @@ function fileExists(filePath: string): boolean {
  * Handles rate limiting (HTTP 429)
  */
 async function requestSound(text: string): Promise<string> {
-  const response = await fetch(`${API_BASE}/sounds`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      engine: 'Google',
-      data: {
-        text: text,
-        voice: 'th-TH',
+  console.log(`  → POST ${API_BASE}/sounds (text="${text}")`);
+  let response: Response;
+  try {
+    response = await fetch(`${API_BASE}/sounds`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    }),
-  });
+      body: JSON.stringify({
+        engine: 'Google',
+        data: {
+          text: text,
+          voice: 'th-TH',
+        },
+      }),
+    });
+  } catch (err) {
+    console.error(`  → Network error: ${err instanceof Error ? err.message : err}`);
+    console.error(`  → Cause: ${(err as Error & { cause?: unknown })?.cause ?? 'unknown'}`);
+    throw err;
+  }
+
+  console.log(`  ← Response status: ${response.status}`);
 
   if (response.status === 429) {
     throw new Error('Rate limit exceeded (429)');
   }
 
   if (!response.ok) {
-    throw new Error(`Failed to create sound: ${response.status} ${response.statusText}`);
+    const body = await response.text().catch(() => '');
+    throw new Error(`Failed to create sound: ${response.status} ${response.statusText} — ${body}`);
   }
 
-  const { id } = await response.json();
-  return id;
+  const data = await response.json();
+  console.log(`  ← Got id: ${data.id}`);
+  return data.id;
 }
 
 /**
@@ -294,10 +306,10 @@ async function main(): Promise<void> {
   const allFailedItems: FailedItem[] = [];
 
   // Generate word audio only
-  const wordStats = await processItems(lesson1Words, 'words');
+  const wordStats = await processItems(lesson2Words, 'words');
   allFailedItems.push(...wordStats.failedItems);
 
-  console.log(`\n✅ Words: ${wordStats.success}/${lesson1Words.length} generated`);
+  console.log(`\n✅ Words: ${wordStats.success}/${lesson2Words.length} generated`);
 
   // Retry failed items
   if (allFailedItems.length > 0) {
@@ -317,7 +329,7 @@ async function main(): Promise<void> {
   }
 
   // Summary
-  const totalItems = lesson1Words.length;
+  const totalItems = lesson2Words.length;
   const totalSuccess = wordStats.success;
   const totalFailed = allFailedItems.length;
 
