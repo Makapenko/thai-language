@@ -2,11 +2,21 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Button } from '../components/Button';
 import { ProgressBar } from '../components/ProgressBar';
-import { lessons, lesson1Words, lesson1Phrases, lesson1Theory } from '../data/lesson1';
+import { lessons as lessons1, lesson1Words, lesson1Phrases, lesson1Theory } from '../data/lesson1';
+import { lesson2, lesson2Words, lesson2Theory } from '../data/lesson2';
 import { useAppSelector } from '../app/hooks';
 import { selectAllLessonProgress } from '../features/progress/progressSlice';
 import { selectLessonWordsProgress } from '../features/words/wordsSlice';
 import styles from './LessonPage.module.css';
+
+const lessons = [...lessons1, lesson2];
+
+function getLessonData(id: number) {
+  if (id === 2) {
+    return { words: lesson2Words, phrases: [] as any[], theory: lesson2Theory };
+  }
+  return { words: lesson1Words, phrases: lesson1Phrases, theory: lesson1Theory };
+}
 
 export function LessonPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -18,6 +28,8 @@ export function LessonPage() {
   const wordsProgress = useAppSelector(selectLessonWordsProgress(id));
   const progress = lessonProgress[id];
 
+  const lessonData = getLessonData(id);
+
   if (!lesson) {
     return (
       <div className={styles.notFound}>
@@ -27,8 +39,8 @@ export function LessonPage() {
     );
   }
 
-  const phrasesProgress = progress
-    ? Math.round((progress.phrasesCompleted / progress.phrasesTotal) * 100)
+  const phrasesProgress = lessonData.phrases.length > 0 && progress
+    ? Math.round((progress.phrasesCompleted / lessonData.phrases.length) * 100)
     : 0;
 
   return (
@@ -45,13 +57,13 @@ export function LessonPage() {
           let subtitle = '';
 
           if (section.type === 'theory') {
-            subtitle = `${lesson1Theory.sections.length} раздела`;
+            subtitle = `${lessonData.theory.sections.length} раздела`;
           } else if (section.type === 'words') {
             sectionProgress = wordsProgress;
-            subtitle = `${lesson1Words.length} слов`;
+            subtitle = `${lessonData.words.length} слов`;
           } else if (section.type === 'phrases') {
             sectionProgress = phrasesProgress;
-            subtitle = `${lesson1Phrases.length} фраз`;
+            subtitle = `${lessonData.phrases.length} фраз`;
           }
 
           return (

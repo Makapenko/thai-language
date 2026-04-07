@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
-import { lessons } from '../data/lesson1';
+import { lessons as lessons1 } from '../data/lesson1';
+import { lesson2 } from '../data/lesson2';
 import { useAppSelector } from '../app/hooks';
 import { selectAllLessonProgress } from '../features/progress/progressSlice';
 import styles from './HomePage.module.css';
+
+const lessons = [...lessons1, lesson2];
 
 export function HomePage() {
   const lessonProgress = useAppSelector(selectAllLessonProgress);
@@ -27,14 +30,15 @@ export function HomePage() {
           {lessons.map((lesson) => {
             const progress = lessonProgress[lesson.id];
             const wordsProgress = progress?.wordsProgress || 0;
-            const phrasesProgress = progress
+            const phrasesTotal = progress?.phrasesTotal || 0;
+            const phrasesProgress = phrasesTotal > 0
               ? Math.round(
-                  (progress.phrasesCompleted / progress.phrasesTotal) * 100
+                  (progress.phrasesCompleted / phrasesTotal) * 100
                 )
               : 0;
-            const overallProgress = Math.round(
-              (wordsProgress + phrasesProgress) / 2
-            );
+            const overallProgress = phrasesTotal > 0
+              ? Math.round((wordsProgress + phrasesProgress) / 2)
+              : wordsProgress;
 
             return (
               <Link
@@ -70,7 +74,7 @@ export function HomePage() {
           })}
 
           {/* Placeholder for future lessons */}
-          {Array.from({ length: 15 }, (_, i) => i + 2).map((num) => (
+          {Array.from({ length: 14 }, (_, i) => i + 3).map((num) => (
             <div key={num} className={styles.lessonLink}>
               <Card variant="outlined" className={styles.lessonCardLocked}>
                 <div className={styles.lessonNumber}>Урок {num}</div>

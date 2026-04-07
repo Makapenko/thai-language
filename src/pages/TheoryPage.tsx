@@ -5,12 +5,16 @@ import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { useAppDispatch } from '../app/hooks';
 import { updateChapterProgress } from '../features/progress/progressSlice';
 import { lesson1Theory, lesson1Words } from '../data/lesson1';
+import { lesson2Theory, lesson2Words } from '../data/lesson2';
 import { speakThai } from '../utils/speech';
 import styles from './TheoryPage.module.css';
+import type { Word } from '../data/types';
+
+const allWords = [...lesson1Words, ...lesson2Words];
 
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
-  const word = lesson1Words.find(w => w.thai === thai);
+  const word = allWords.find(w => w.thai === thai);
   return word ? word.id : null;
 };
 
@@ -20,13 +24,18 @@ const getAudioFile = (thai: string): string | null => {
   return wordId ? `words/${wordId}.mp3` : null;
 };
 
+function getLessonTheory(id: number) {
+  if (id === 2) return lesson2Theory;
+  return lesson1Theory;
+}
+
 export function TheoryPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const id = parseInt(lessonId || '1', 10);
 
-  const theory = lesson1Theory;
+  const theory = getLessonTheory(id);
 
   const handleSpeak = (text: string) => {
     const audioFile = getAudioFile(text);

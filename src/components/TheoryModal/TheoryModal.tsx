@@ -1,15 +1,19 @@
 import { lesson1Theory, lesson1Words } from '../../data/lesson1';
+import { lesson2Theory, lesson2Words } from '../../data/lesson2';
 import { speakThai } from '../../utils/speech';
 import styles from './TheoryModal.module.css';
 
 interface TheoryModalProps {
   isOpen: boolean;
   onClose: () => void;
+  lessonId?: number;
 }
+
+const allWords = [...lesson1Words, ...lesson2Words];
 
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
-  const word = lesson1Words.find(w => w.thai === thai);
+  const word = allWords.find(w => w.thai === thai);
   return word ? word.id : null;
 };
 
@@ -19,8 +23,13 @@ const getAudioFile = (thai: string): string | null => {
   return wordId ? `words/${wordId}.mp3` : null;
 };
 
-export function TheoryModal({ isOpen, onClose }: TheoryModalProps) {
-  const theory = lesson1Theory;
+function getLessonTheory(id: number) {
+  if (id === 2) return lesson2Theory;
+  return lesson1Theory;
+}
+
+export function TheoryModal({ isOpen, onClose, lessonId = 1 }: TheoryModalProps) {
+  const theory = getLessonTheory(lessonId);
 
   const handleSpeak = (text: string) => {
     const audioFile = getAudioFile(text);

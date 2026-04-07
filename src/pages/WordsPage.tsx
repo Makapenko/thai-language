@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { ProgressBar } from '../components/ProgressBar';
 import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { lesson1Words } from '../data/lesson1';
+import { lesson2Words } from '../data/lesson2';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setWords,
@@ -26,6 +27,11 @@ import { storage } from '../features/progress/storage';
 import styles from './WordsPage.module.css';
 
 const OPTIONS_COUNT = 6;
+
+function getLessonWords(id: number): Word[] {
+  if (id === 2) return lesson2Words;
+  return lesson1Words;
+}
 
 export function WordsPage() {
   const { lessonId } = useParams<{ lessonId: string }>();
@@ -62,8 +68,8 @@ export function WordsPage() {
   const lastWordIdRef = useRef<string | null>(null);
 
   // Filter out service words (not shown in word exercise)
-  const lessonWords = useMemo(() => 
-    lesson1Words.filter((w) => w.lessonId === id && !w.isService), 
+  const lessonWords = useMemo(() =>
+    getLessonWords(id).filter((w) => w.lessonId === id && !w.isService),
     [id]
   );
 
@@ -78,19 +84,19 @@ export function WordsPage() {
   // 3. No progress data exists (first time user)
   useEffect(() => {
     const hasProgressData = Object.keys(wordsProgress).length > 0;
-    
+
     console.log('[WordsPage] Check restore:', {
       lessonWordsLength: lessonWords.length,
       unlockedWordsLength: unlockedWords.length,
       hasProgressData,
       isInitialized
     });
-    
+
     // Only call restoreUnlockedWords if:
     // - Words are loaded
     // - No unlocked words yet
     // - NO progress data (first time user, no localStorage)
-    if (lessonWords.length > 0 && 
+    if (lessonWords.length > 0 &&
         unlockedWords.length === 0 &&
         !hasProgressData) {
       // No progress data from localStorage - initialize with first word
@@ -127,7 +133,7 @@ export function WordsPage() {
       return null; // All words completed
     }
 
-    // Filter out the last selected word to avoid consecutive repeats
+    // Filter out the last selected word ID to avoid consecutive repeats
     // But only if there are other options available
     const availableWords = incompleteWords.filter(
       (word) => word.id !== lastWordIdRef.current
@@ -195,7 +201,7 @@ export function WordsPage() {
   // Initial setup - only run once after words are loaded and unlocked words are restored
   useEffect(() => {
     const hasProgressData = Object.keys(wordsProgress).length > 0;
-    
+
     console.log('[WordsPage] Init check:', {
       isInitialized,
       lessonWordsLength: lessonWords.length,
