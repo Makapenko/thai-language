@@ -1,11 +1,19 @@
 import type { Phrase, SentenceType } from './types';
 import { patterns, patternsWithObject } from './phrasePatterns';
+import { questionPatterns } from './phrasePatterns.lesson2';
+import type { QuestionWord } from './phrasePatterns.lesson2';
 
 // Re-export types for backward compatibility
 export type { Subject, Verb, Noun } from './phrasePatterns';
 
+// Re-export question types for lesson 2
+export type { QuestionWord } from './phrasePatterns.lesson2';
+
 // Re-export from phrasePatterns for consumers
 export { TENSE_MARKERS, ENDINGS, patterns, patternsWithObject } from './phrasePatterns';
+
+// Re-export question patterns for consumers
+export { questionPatterns } from './phrasePatterns.lesson2';
 
 // Import types for internal use
 import type { Subject, Verb, Noun } from './phrasePatterns';
@@ -65,6 +73,40 @@ export function generatePhrasesWithObjects(
             thai: pattern.buildThai(subject, verb, noun),
             transcription: pattern.buildTranscription(subject, verb, noun),
             structure: pattern.buildStructure(subject, verb, noun),
+            lessonId,
+          });
+        }
+      }
+    }
+  }
+
+  return phrases;
+}
+
+// Generate question phrases from subjects, verbs, question words, and question pattern types
+export function generateQuestionPhrases(
+  subjects: Subject[],
+  verbs: Verb[],
+  questionWords: QuestionWord[],
+  patternTypes: SentenceType[],
+  lessonId: number,
+  idPrefix: string = 'q'
+): Phrase[] {
+  const phrases: Phrase[] = [];
+  let counter = 1;
+
+  const selectedPatterns = questionPatterns.filter(p => patternTypes.includes(p.type));
+
+  for (const pattern of selectedPatterns) {
+    for (const subject of subjects) {
+      for (const verb of verbs) {
+        for (const qw of questionWords) {
+          phrases.push({
+            id: `${idPrefix}${lessonId}-${counter++}`,
+            russian: pattern.russianTemplate(subject, verb, qw),
+            thai: pattern.buildThai(subject, verb, qw),
+            transcription: pattern.buildTranscription(subject, verb, qw),
+            structure: pattern.buildStructure(subject, verb, qw),
             lessonId,
           });
         }

@@ -295,6 +295,17 @@
   }
 }
 
+/* Mobile: question card full width */
+@media (max-width: 767px) {
+  .questionCard {
+    width: 100vw;
+    margin-left: calc(-1 * var(--container-padding));
+    padding-left: var(--container-padding);
+    padding-right: var(--container-padding);
+    border-radius: 0;
+  }
+}
+
 /* Боковая панель с неправильными словами */
 .wrongWordsSidebar {
   width: 220px;

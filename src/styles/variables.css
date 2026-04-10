@@ -25,6 +25,10 @@
   /* Thai text accent */
   --color-thai: #1976D2;
 
+  /* Question words highlight */
+  --color-question: #E67E22;
+  --color-question-light: #FFF3E0;
+
   /* Borders */
   --color-border: #E0E0E0;
   --color-border-focus: #4A90D9;

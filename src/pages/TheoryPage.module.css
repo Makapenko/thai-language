@@ -106,6 +106,15 @@
   line-height: var(--line-height-relaxed);
 }
 
+.sectionTable td strong {
+  color: var(--color-question);
+  text-decoration: none;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-question-light);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
 .note {
   background-color: var(--color-bg);
   border-left: 3px solid var(--color-primary);
@@ -158,6 +167,15 @@
   background-color: var(--color-bg);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-sm);
+}
+
+.table td strong {
+  color: var(--color-question);
+  text-decoration: none;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-question-light);
+  padding: 1px 4px;
+  border-radius: 3px;
 }
 
 .rowLabel {

@@ -6,6 +6,7 @@ import { PhraseProgressBar } from '../components/PhraseProgressBar';
 import { TheoryModal } from '../components/TheoryModal/TheoryModal';
 import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { lesson1Phrases, lesson1WordGroups } from '../data/lesson1';
+import { lesson2AllPhrases, lesson2WordGroups } from '../data/lesson2/phrases';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setPhrases,
@@ -22,11 +23,13 @@ import {
   selectIsRetrying,
   selectJustAdvanced,
   selectPhrasesExerciseComplete,
+  selectWordGroups,
   updatePhrasesTimeSpent,
 } from '../features/phrases/phrasesSlice';
 import { speakThai, speakThaiPhrase } from '../utils/speech';
 import { shuffle } from '../utils/shuffle';
 import { lesson1Words } from '../data/lesson1/words';
+import { lesson2Words } from '../data/lesson2/words';
 import styles from './PhrasesPage.module.css';
 
 // Статус слова в списке ошибок
@@ -42,9 +45,12 @@ interface WrongWord {
 
 const OPTIONS_PER_GROUP = 4;
 
+// Combined words from all lessons
+const allLessonWords = [...lesson1Words, ...lesson2Words];
+
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
-  const word = lesson1Words.find(w => w.thai === thai);
+  const word = allLessonWords.find(w => w.thai === thai);
   return word ? word.id : null;
 };
 
@@ -76,6 +82,7 @@ export function PhrasesPage() {
   const isRetrying = useAppSelector(selectIsRetrying);
   const justAdvanced = useAppSelector(selectJustAdvanced);
   const isComplete = useAppSelector(selectPhrasesExerciseComplete);
+  const wordGroups = useAppSelector(selectWordGroups);
 
   const [showResult, setShowResult] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
@@ -85,9 +92,21 @@ export function PhrasesPage() {
 
   // Initialize phrases
   useEffect(() => {
-    const shuffledPhrases = shuffle(lesson1Phrases.filter((p) => p.lessonId === id));
+    // Select phrases and word groups based on lesson ID
+    let phrases: typeof lesson1Phrases;
+    let wordGroups: typeof lesson1WordGroups;
+
+    if (id === 2) {
+      phrases = lesson2AllPhrases;
+      wordGroups = lesson2WordGroups;
+    } else {
+      phrases = lesson1Phrases;
+      wordGroups = lesson1WordGroups;
+    }
+
+    const shuffledPhrases = shuffle(phrases.filter((p) => p.lessonId === id));
     dispatch(setPhrases(shuffledPhrases));
-    dispatch(setWordGroups(lesson1WordGroups));
+    dispatch(setWordGroups(wordGroups));
   }, [dispatch, id]);
 
   // Generate options for current phrase
@@ -262,9 +281,9 @@ export function PhrasesPage() {
     speakThai(text, audioFile || undefined);
   };
 
-  // Get word info for display
+  // Get word info for display — searches in current lesson's word groups
   const getWordInfo = (thai: string) => {
-    for (const group of lesson1WordGroups) {
+    for (const group of wordGroups) {
       const option = group.options.find((opt) => opt.thai === thai);
       if (option) return option;
     }

@@ -8,7 +8,6 @@ import { lesson1Theory, lesson1Words } from '../data/lesson1';
 import { lesson2Theory, lesson2Words } from '../data/lesson2';
 import { speakThai } from '../utils/speech';
 import styles from './TheoryPage.module.css';
-import type { Word } from '../data/types';
 
 const allWords = [...lesson1Words, ...lesson2Words];
 
@@ -98,7 +97,7 @@ export function TheoryPage() {
                       {section.table.rows.map((row, rIndex) => (
                         <tr key={rIndex}>
                           {row.cells.map((cell, cIndex) => (
-                            <td key={cIndex}>{cell}</td>
+                            <td key={cIndex} dangerouslySetInnerHTML={{ __html: cell }} />
                           ))}
                         </tr>
                       ))}

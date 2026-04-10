@@ -90,7 +90,14 @@ export type SentenceType =
   | 'past_negative_obj'        // Я не открывал дверь
   | 'future_affirmative_obj'   // Я открою дверь
   | 'future_negative_obj'      // Я не открою дверь
-  | 'continuous_obj';          // Я сейчас открываю дверь
+  | 'continuous_obj'           // Я сейчас открываю дверь
+  // Open questions with question words (Lesson 2)
+  | 'question_who'             // คุณเห็นใคร? — Кого ты видишь?
+  | 'question_what'            // คุณทำอะไร? — Что ты делаешь?
+  | 'question_when'            // เขาไปเมื่อไหร่? — Когда он поедет?
+  | 'question_where'           // เธออยู่ที่ไหน? — Где ты находишься?
+  | 'question_why'             // ทำไมเขาไม่มา? — Почему он не пришёл?
+  | 'question_how';            // คุณไปอย่างไร? — Как ты поедешь?
 
 export interface SentencePattern {
   type: SentenceType;

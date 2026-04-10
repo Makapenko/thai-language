@@ -57,42 +57,50 @@ const wordsSlice = createSlice({
       state.dailyProgress = action.payload;
     },
 
-    restoreUnlockedWords: (state) => {
+    restoreUnlockedWords: (state, action: PayloadAction<number | undefined>) => {
       if (state.words.length === 0) return;
 
-      // Don't overwrite if unlockedWordIds already has data (e.g., from localStorage)
-      if (state.unlockedWordIds.length > 0) {
-        // Check if the unlocked words are valid for current words
-        const allWordIds = state.words.map(w => w.id);
-        const hasValidUnlockedWords = state.unlockedWordIds.some(id => allWordIds.includes(id));
-        if (hasValidUnlockedWords) {
-          console.log('[wordsSlice] restoreUnlockedWords: skipping, already has valid unlocked words');
+      const currentLessonId = action.payload ?? 0;
+      const lessonWords = currentLessonId > 0
+        ? state.words.filter(w => w.lessonId === currentLessonId)
+        : state.words;
+      const lessonWordIds = lessonWords.map(w => w.id);
+
+      // Filter unlockedWordIds to only include words from the current lesson
+      const lessonUnlockedIds = state.unlockedWordIds.filter(id => lessonWordIds.includes(id));
+
+      // If we have valid unlocked words for THIS lesson, don't recalculate
+      if (lessonUnlockedIds.length > 0) {
+        // Check if the first word of this lesson is unlocked (valid starting point)
+        const hasValidStart = lessonUnlockedIds.includes(lessonWordIds[0]);
+        if (hasValidStart) {
+          console.log('[wordsSlice] restoreUnlockedWords: skipping, already has valid unlocked words for lesson', currentLessonId);
           return;
         }
       }
 
-      const allWordIds = state.words.map(w => w.id);
+      // Start with the first word of this lesson always unlocked
+      const unlockedSet = new Set<string>([lessonWordIds[0]]);
 
-      // Start with the first word always unlocked
-      const unlockedSet = new Set<string>([allWordIds[0]]);
-
-      // For each word, if it has correctStreak >= 3, unlock the next word
-      for (let i = 0; i < allWordIds.length - 1; i++) {
-        const wordId = allWordIds[i];
+      // For each word in this lesson, if it has correctStreak >= 3, unlock the next word
+      for (let i = 0; i < lessonWordIds.length - 1; i++) {
+        const wordId = lessonWordIds[i];
         const wordProgress = state.progress[wordId];
 
         // If this word has been practiced and has correctStreak >= 3, unlock the next word
         if (wordProgress && wordProgress.correctStreak >= 3) {
-          unlockedSet.add(allWordIds[i + 1]);
+          unlockedSet.add(lessonWordIds[i + 1]);
         }
 
         // Also if word is completed, unlock the next word
         if (wordProgress && wordProgress.completed) {
-          unlockedSet.add(allWordIds[i + 1]);
+          unlockedSet.add(lessonWordIds[i + 1]);
         }
       }
 
-      state.unlockedWordIds = Array.from(unlockedSet);
+      // Merge with any existing unlocked words from other lessons
+      const otherLessonUnlockedIds = state.unlockedWordIds.filter(id => !lessonWordIds.includes(id));
+      state.unlockedWordIds = [...otherLessonUnlockedIds, ...Array.from(unlockedSet)];
       console.log('[wordsSlice] restoreUnlockedWords: set unlockedWordIds to', state.unlockedWordIds);
     },
 
@@ -301,10 +309,8 @@ export const selectLessonWordsComplete = (lessonId: number) => (state: { words: 
   return allWordsUnlocked && allCompleted;
 };
 
-export const selectUnlockedWords = createSelector(
-  (state: { words: WordsState }) => state.words.unlockedWordIds,
-  (unlockedWordIds) => unlockedWordIds
-);
+export const selectUnlockedWords = (state: { words: WordsState }) =>
+  state.words.unlockedWordIds;
 
 export const selectUnlockedWordsByLesson = (lessonId: number) => createSelector(
   [(state: { words: WordsState }) => state.words.words, (state: { words: WordsState }) => state.words.unlockedWordIds],

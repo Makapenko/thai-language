@@ -69,12 +69,12 @@ export const lesson2Theory: TheoryData = {
       table: {
         headers: ['Тайский', 'Транскрипция', 'Перевод'],
         rows: [
-          { cells: ['คุณเห็นใคร?', 'khun hěn krai?', 'Кого ты видишь?'] },
-          { cells: ['เขาไปเมื่อไหร่?', 'khǎo bpai mûea-rài?', 'Когда он поедет?'] },
-          { cells: ['คุณทำอะไร?', 'khun tham à-rai?', 'Что ты делаешь?'] },
-          { cells: ['เธออยู่ที่ไหน?', 'thə̌ə yùu tîi-nǎi?', 'Где ты находишься?'] },
-          { cells: ['ทำไมเขาไม่มา?', 'tam-mai khǎo mâi maa?', 'Почему он не пришёл?'] },
-          { cells: ['คุณไปอย่างไร?', 'khun bpai yàang-rai?', 'Как ты поедешь?'] },
+          { cells: ['คุณเห็น<strong>ใคร</strong>?', 'khun hěn <strong>krai</strong>?', '<strong>Кого</strong> ты видишь?'] },
+          { cells: ['เขาไป<strong>เมื่อไหร่</strong>?', 'khǎo bpai <strong>mûea-rài</strong>?', '<strong>Когда</strong> он поедет?'] },
+          { cells: ['คุณทำ<strong>อะไร</strong>?', 'khun tham <strong>à-rai</strong>?', '<strong>Что</strong> ты делаешь?'] },
+          { cells: ['เธออยู่ที่<strong>ไหน</strong>?', 'thə̌ə yùu <strong>tîi-nǎi</strong>?', '<strong>Где</strong> ты находишься?'] },
+          { cells: ['<strong>ทำไม</strong>เขาไม่มา?', '<strong>tam-mai</strong> khǎo mâi maa?', '<strong>Почему</strong> он не пришёл?'] },
+          { cells: ['คุณไป<strong>อย่างไร</strong>?', 'khun bpai <strong>yàang-rai</strong>?', '<strong>Как</strong> ты поедешь?'] },
         ],
       },
     },

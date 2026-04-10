@@ -154,6 +154,15 @@
   line-height: var(--line-height-relaxed);
 }
 
+.table td strong {
+  color: var(--color-question);
+  text-decoration: none;
+  font-weight: var(--font-weight-bold);
+  background-color: var(--color-question-light);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
 .note {
   background-color: var(--color-bg-card);
   border-left: 3px solid var(--color-primary);

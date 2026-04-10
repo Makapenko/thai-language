@@ -302,10 +302,8 @@ export const selectPhrasesStats = (state: { phrases: PhrasesState }) => {
   };
 };
 
-export const selectPhraseProgress = createSelector(
-  (state: { phrases: PhrasesState }) => state.phrases.progress,
-  (progress) => progress
-);
+export const selectPhraseProgress = (state: { phrases: PhrasesState }) =>
+  state.phrases.progress;
 
 export const selectPhraseProgressByLesson = (lessonId: number) => createSelector(
   [(state: { phrases: PhrasesState }) => state.phrases.phrases, (state: { phrases: PhrasesState }) => state.phrases.progress],

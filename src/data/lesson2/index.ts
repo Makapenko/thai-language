@@ -2,6 +2,7 @@ import type { Lesson } from '../types';
 
 export { lesson2Words } from './words';
 export { lesson2Theory } from './theory';
+export { lesson2AllPhrases, lesson2WordGroups } from './phrases';
 
 export const lesson2: Lesson = {
   id: 2,
@@ -19,6 +20,12 @@ export const lesson2: Lesson = {
       type: 'words',
       title: 'Новые слова',
       description: 'Местоимения, вопросительные слова и вежливые частицы',
+    },
+    {
+      id: 'phrases',
+      type: 'phrases',
+      title: 'Составление фраз',
+      description: 'Упражнение на построение предложений с вопросительными словами',
     },
   ],
 };

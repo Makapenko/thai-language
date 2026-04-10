@@ -10,10 +10,7 @@ import type { DailyPhraseProgress } from '../features/phrases/phrasesSlice';
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
-const selectDailyProgress = createSelector(
-  (state: RootState) => state.progress.dailyProgress,
-  (dailyProgress) => dailyProgress
-);
+const selectDailyProgress = (state: RootState) => state.progress.dailyProgress;
 
 const selectTodayProgress = createSelector(
   (state: RootState) => state.progress.dailyProgress,
@@ -55,10 +52,7 @@ const selectTodayExercises = createSelector(
   }
 );
 
-const selectFavorites = createSelector(
-  (state: RootState) => state.progress.favorites,
-  (favorites) => favorites
-);
+const selectFavorites = (state: RootState) => state.progress.favorites;
 
 // Get test results by type (all time, sorted by date desc)
 export const createSelectTestsByType = (activityId: string) =>

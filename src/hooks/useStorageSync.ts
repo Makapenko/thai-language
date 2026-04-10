@@ -65,11 +65,13 @@ export function useStorageSync() {
 
         // Restore unlocked words from localStorage or from progress
         // Priority: localStorage data > computed from progress
+        // Note: We restore ALL lesson unlocked words here, and WordsPage will call
+        // restoreUnlockedWords(lessonId) if needed for the current lesson
         if (data.unlockedWordIds && data.unlockedWordIds.length > 0) {
           console.log('[useStorageSync] Restoring unlockedWordIds from localStorage:', data.unlockedWordIds);
           dispatch(setUnlockedWords(data.unlockedWordIds));
         }
-        // Note: If no unlockedWordIds in localStorage, WordsPage will call restoreUnlockedWords
+        // Note: If no unlockedWordIds in localStorage, WordsPage will call restoreUnlockedWords(lessonId)
 
         isInitialized.current = true;
         console.log('[useStorageSync] Initialization complete');

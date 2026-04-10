@@ -300,23 +300,17 @@ export default progressSlice.reducer;
 export const selectLessonProgress = (lessonId: number) => (state: { progress: ProgressState }) =>
   state.progress.lessonProgress[lessonId];
 
-export const selectAllLessonProgress = createSelector(
-  (state: { progress: ProgressState }) => state.progress.lessonProgress,
-  (lessonProgress) => lessonProgress
-);
+export const selectAllLessonProgress = (state: { progress: ProgressState }) =>
+  state.progress.lessonProgress;
 
-export const selectSettings = createSelector(
-  (state: { progress: ProgressState }) => state.progress.settings,
-  (settings) => settings
-);
+export const selectSettings = (state: { progress: ProgressState }) =>
+  state.progress.settings;
 
 export const selectIsProgressLoaded = (state: { progress: ProgressState }) =>
   state.progress.isLoaded;
 
-export const selectDailyProgress = createSelector(
-  (state: { progress: ProgressState }) => state.progress.dailyProgress,
-  (dailyProgress) => dailyProgress
-);
+export const selectDailyProgress = (state: { progress: ProgressState }) =>
+  state.progress.dailyProgress;
 
 export const selectTodayProgress = createSelector(
   [(state: { progress: ProgressState }) => state.progress.dailyProgress],
@@ -358,10 +352,8 @@ export const selectTodayExercises = createSelector(
   }
 );
 
-export const selectFavorites = createSelector(
-  (state: { progress: ProgressState }) => state.progress.favorites,
-  (favorites) => favorites
-);
+export const selectFavorites = (state: { progress: ProgressState }) =>
+  state.progress.favorites;
 
 export const selectTimeSpentByActivity = createSelector(
   [(state: { progress: ProgressState }) => state.progress.dailyProgress],

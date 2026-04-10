@@ -78,32 +78,26 @@ export function WordsPage() {
     dispatch(setWords(lessonWords));
   }, [dispatch, lessonWords]);
 
-  // Restore unlocked words only if:
-  // 1. Words are loaded
-  // 2. No unlocked words for this lesson yet
-  // 3. No progress data exists (first time user)
+  // Restore unlocked words for this lesson if needed
   useEffect(() => {
-    const hasProgressData = Object.keys(wordsProgress).length > 0;
-
     console.log('[WordsPage] Check restore:', {
       lessonWordsLength: lessonWords.length,
       unlockedWordsLength: unlockedWords.length,
-      hasProgressData,
+      hasProgressData: Object.keys(wordsProgress).length > 0,
       isInitialized
     });
 
-    // Only call restoreUnlockedWords if:
+    // Call restoreUnlockedWords if:
     // - Words are loaded
-    // - No unlocked words yet
-    // - NO progress data (first time user, no localStorage)
-    if (lessonWords.length > 0 &&
-        unlockedWords.length === 0 &&
-        !hasProgressData) {
-      // No progress data from localStorage - initialize with first word
-      console.log('[WordsPage] Calling restoreUnlockedWords (no progress data)');
-      dispatch(restoreUnlockedWords());
+    // - No unlocked words for THIS lesson yet
+    // This handles both:
+    // 1. First time user (no localStorage data)
+    // 2. Switching lessons (localStorage has data for different lesson)
+    if (lessonWords.length > 0 && unlockedWords.length === 0) {
+      console.log('[WordsPage] Calling restoreUnlockedWords for lesson', id);
+      dispatch(restoreUnlockedWords(id));
     }
-  }, [dispatch, lessonWords.length, unlockedWords.length, wordsProgress, isInitialized]);
+  }, [dispatch, lessonWords.length, unlockedWords.length, wordsProgress, isInitialized, id]);
 
   // Reset initialization flag when lessonId changes
   useEffect(() => {
@@ -266,7 +260,7 @@ export function WordsPage() {
     // Clear unlockedWordIds so restoreUnlockedWords will recalculate
     dispatch(setUnlockedWords([]));
     // Restore unlocked words (will unlock only first word since progress is cleared)
-    dispatch(restoreUnlockedWords());
+    dispatch(restoreUnlockedWords(id));
     setIsInitialized(false);
 
     // Clear localStorage to prevent restoration of old progress on reload
