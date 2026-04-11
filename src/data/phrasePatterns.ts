@@ -12,6 +12,7 @@ export interface Subject {
   russian: string;
   conjIndex: 0 | 1 | 2 | 3 | 4 | 5;
   gender: 'masc' | 'fem' | 'plural';
+  register?: 'formal' | 'neutral' | 'informal' | 'rude';
 }
 
 export interface Verb {
@@ -38,7 +39,10 @@ export interface ObjectPronoun {
   thai: string;
   transcription: string;
   russian: string;
-  russianAccusative: string;
+  russianAccusative: string;  // винительный: меня, тебя, его
+  russianDative: string;      // дательный: мне, тебе, ему
+  register: 'formal' | 'neutral' | 'informal' | 'rude';
+  conjIndex: 0 | 1 | 2 | 3 | 4 | 5;  // grammatical person for reflexive checking
 }
 
 // ============================================================
@@ -383,13 +387,29 @@ export const patternsWithObject: PatternWithObject[] = [
 ];
 
 // ============================================================
+// Verbs that require dative case (кому?)
+// ============================================================
+// Примечание:ถาม (спрашивать) использует винительный падеж в русском (спрашиваю его)
+const dativeVerbs = ['ให้', 'ช่วย', 'โทร', 'ตอบ'];
+
+/**
+ * Get the correct object form based on verb
+ */
+function getObjectForm(verb: Verb, objectPronoun: ObjectPronoun): string {
+  if (dativeVerbs.includes(verb.thai)) {
+    return objectPronoun.russianDative;
+  }
+  return objectPronoun.russianAccusative;
+}
+
+// ============================================================
 // PATTERNS WITH PRONOUN OBJECT — шаблоны с местоимениями-объектами (8 штук)
 // ============================================================
 export const patternsWithPronounObject: PatternWithPronounObject[] = [
-  // Present affirmative with pronoun object: Я вижу тебя
+  // Present affirmative with pronoun object: Я вижу тебя / Я даю тебе
   {
     type: 'present_affirmative_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} ${v.present[s.conjIndex]} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} ${v.present[s.conjIndex]} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -399,10 +419,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${v.transcription} ${o.transcription}`,
   },
 
-  // Present negative with pronoun object: Я не вижу тебя
+  // Present negative with pronoun object: Я не вижу тебя / Я не даю тебе
   {
     type: 'present_negative_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} не ${v.present[s.conjIndex]} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} не ${v.present[s.conjIndex]} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.negativePresent.thai, transcription: TENSE_MARKERS.negativePresent.transcription },
@@ -413,10 +433,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${TENSE_MARKERS.negativePresent.transcription} ${v.transcription} ${o.transcription}`,
   },
 
-  // Present question with pronoun object: Ты видишь меня?
+  // Present question with pronoun object: Ты видишь меня? / Ты даёшь мне?
   {
     type: 'present_question_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} ${v.present[s.conjIndex]} ${o.russianAccusative}?`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} ${v.present[s.conjIndex]} ${getObjectForm(v, o)}?`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -427,10 +447,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${v.transcription} ${o.transcription} ${ENDINGS.question.transcription}`,
   },
 
-  // Past affirmative with pronoun object: Я видел тебя
+  // Past affirmative with pronoun object: Я видел тебя / Я дал тебе
   {
     type: 'past_affirmative_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${s.russian} ${getPastForm(v, s)} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${s.russian} ${getPastForm(v, s)} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -441,10 +461,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${v.transcription} ${o.transcription} ${ENDINGS.past.transcription}`,
   },
 
-  // Past negative with pronoun object: Я не видел тебя
+  // Past negative with pronoun object: Я не видел тебя / Я не дал тебе
   {
     type: 'past_negative_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${s.russian} не ${getPastForm(v, s)} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${s.russian} не ${getPastForm(v, s)} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.negativePast.thai, transcription: TENSE_MARKERS.negativePast.transcription },
@@ -455,10 +475,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${TENSE_MARKERS.negativePast.transcription} ${v.transcription} ${o.transcription}`,
   },
 
-  // Future affirmative with pronoun object: Я увижу тебя
+  // Future affirmative with pronoun object: Я увижу тебя / Я дам тебе
   {
     type: 'future_affirmative_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} ${v.future[s.conjIndex]} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} ${v.future[s.conjIndex]} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.future.thai, transcription: TENSE_MARKERS.future.transcription },
@@ -469,10 +489,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${TENSE_MARKERS.future.transcription} ${v.transcription} ${o.transcription}`,
   },
 
-  // Future negative with pronoun object: Я не увижу тебя
+  // Future negative with pronoun object: Я не увижу тебя / Я не дам тебе
   {
     type: 'future_negative_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} не ${v.future[s.conjIndex]} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} не ${v.future[s.conjIndex]} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.negativeFuture.thai, transcription: TENSE_MARKERS.negativeFuture.transcription },
@@ -483,10 +503,10 @@ export const patternsWithPronounObject: PatternWithPronounObject[] = [
     buildTranscription: (s, v, o) => `${s.transcription} ${TENSE_MARKERS.negativeFuture.transcription} ${v.transcription} ${o.transcription}`,
   },
 
-  // Continuous with pronoun object: Я сейчас вижу тебя
+  // Continuous with pronoun object: Я сейчас вижу тебя / Я сейчас даю тебе
   {
     type: 'continuous_obj_pron',
-    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} сейчас ${v.continuous[s.conjIndex]} ${o.russianAccusative}`),
+    russianTemplate: (s, v, o) => capitalizeFirst(`${getSubjectLabel(s)} сейчас ${v.continuous[s.conjIndex]} ${getObjectForm(v, o)}`),
     buildStructure: (s, v, o) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.continuous.thai, transcription: TENSE_MARKERS.continuous.transcription },

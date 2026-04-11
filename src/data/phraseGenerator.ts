@@ -19,6 +19,62 @@ export { questionPatterns } from './phrasePatterns.lesson2';
 // Import types for internal use
 import type { Subject, Verb, Noun, ObjectPronoun } from './phrasePatterns';
 
+// ============================================================
+// Register compatibility table
+// ============================================================
+const compatibleRegisters: Record<string, string[]> = {
+  'formal': ['formal', 'neutral'],
+  'neutral': ['formal', 'neutral', 'informal'],
+  'informal': ['neutral', 'informal', 'rude'],
+  'rude': ['informal', 'rude'],
+};
+
+/**
+ * Check if subject and object pronoun registers are compatible
+ */
+function isRegisterCompatible(subject: Subject, objectPronoun: ObjectPronoun): boolean {
+  // If subject has no register defined, assume neutral (allow all)
+  const subjectRegister = subject.register || 'neutral';
+  const allowedRegisters = compatibleRegisters[subjectRegister];
+  return allowedRegisters.includes(objectPronoun.register);
+}
+
+/**
+ * Check if the combination is reflexive (subject === object)
+ * Uses conjIndex to determine if both represent the same grammatical person
+ */
+function isReflexive(subject: Subject, objectPronoun: ObjectPronoun): boolean {
+  // Direct Thai text match
+  if (subject.thai === objectPronoun.thai) {
+    return true;
+  }
+  
+  // Check if they represent the same grammatical person via conjIndex
+  // conjIndex: 0 = I/me, 1 = you/thou, 2 = he/him/she/her, 3 = we/us, 4 = you (pl)/you, 5 = they/them
+  if (subject.conjIndex === objectPronoun.conjIndex) {
+    // Additional check: make sure they're actually the same person in Russian
+    const subjectPerson = subject.russian.split('(')[0].trim();
+    const objectPerson = objectPronoun.russian.split('(')[0].trim();
+    
+    // Map Russian pronouns to persons
+    const subjectIsFirstPerson = subjectPerson === 'я';
+    const objectIsFirstPerson = objectPerson === 'я';
+    const subjectIsSecondPerson = subjectPerson === 'ты' || subjectPerson === 'вы';
+    const objectIsSecondPerson = objectPerson === 'ты' || objectPerson === 'вы';
+    const subjectIsThirdPerson = ['он', 'она', 'они'].includes(subjectPerson);
+    const objectIsThirdPerson = ['он', 'она', 'они'].includes(objectPerson);
+    
+    // If both are same person AND same conjIndex, it's reflexive
+    if ((subjectIsFirstPerson && objectIsFirstPerson) ||
+        (subjectIsSecondPerson && objectIsSecondPerson) ||
+        (subjectIsThirdPerson && objectIsThirdPerson)) {
+      return true;
+    }
+  }
+  
+  return false;
+}
+
 // Generate phrases from subjects, verbs, and pattern types
 export function generatePhrases(
   subjects: Subject[],
@@ -159,6 +215,16 @@ export function generatePhrasesWithPronounObjects(
     for (const subject of subjects) {
       for (const verb of verbs) {
         for (const objectPronoun of objectPronouns) {
+          // Skip reflexive combinations (subject === object)
+          if (isReflexive(subject, objectPronoun)) {
+            continue;
+          }
+
+          // Skip register-incompatible combinations
+          if (!isRegisterCompatible(subject, objectPronoun)) {
+            continue;
+          }
+
           phrases.push({
             id: `${idPrefix}${lessonId}-${counter++}`,
             russian: pattern.russianTemplate(subject, verb, objectPronoun),

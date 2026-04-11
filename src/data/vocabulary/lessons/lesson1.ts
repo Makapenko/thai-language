@@ -595,15 +595,15 @@ export const nouns: Noun[] = [
 // Разделяем многозначные местоимения на отдельные записи для ясности
 // ============================================================
 export const objectPronouns: ObjectPronoun[] = [
-  { thai: 'ผม', transcription: 'pǒm', russian: 'я (муж.)', russianAccusative: 'меня' },
-  { thai: 'ฉัน', transcription: 'chǎn', russian: 'я (жен.)', russianAccusative: 'меня' },
-  { thai: 'คุณ', transcription: 'kun', russian: 'ты', russianAccusative: 'тебя' },
-  { thai: 'คุณ', transcription: 'kun', russian: 'вы', russianAccusative: 'вас' },
-  { thai: 'เขา', transcription: 'kǎo', russian: 'он', russianAccusative: 'его' },
-  { thai: 'เขา', transcription: 'kǎo', russian: 'она', russianAccusative: 'её' },
-  { thai: 'เรา', transcription: 'rao', russian: 'мы', russianAccusative: 'нас' },
-  { thai: 'พวกเขา', transcription: 'pûak-kǎo', russian: 'они', russianAccusative: 'их' },
-  { thai: 'มัน', transcription: 'man', russian: 'оно', russianAccusative: 'его' },
+  { thai: 'ผม', transcription: 'pǒm', russian: 'я (муж.)', russianAccusative: 'меня', russianDative: 'мне', register: 'neutral', conjIndex: 0 },
+  { thai: 'ฉัน', transcription: 'chǎn', russian: 'я (жен.)', russianAccusative: 'меня', russianDative: 'мне', register: 'neutral', conjIndex: 0 },
+  { thai: 'คุณ', transcription: 'kun', russian: 'ты', russianAccusative: 'тебя', russianDative: 'тебе', register: 'neutral', conjIndex: 1 },
+  { thai: 'คุณ', transcription: 'kun', russian: 'вы', russianAccusative: 'вас', russianDative: 'вам', register: 'neutral', conjIndex: 4 },
+  { thai: 'เขา', transcription: 'kǎo', russian: 'он', russianAccusative: 'его', russianDative: 'ему', register: 'neutral', conjIndex: 2 },
+  { thai: 'เขา', transcription: 'kǎo', russian: 'она', russianAccusative: 'её', russianDative: 'ей', register: 'neutral', conjIndex: 2 },
+  { thai: 'เรา', transcription: 'rao', russian: 'мы', russianAccusative: 'нас', russianDative: 'нам', register: 'neutral', conjIndex: 3 },
+  { thai: 'พวกเขา', transcription: 'pûak-kǎo', russian: 'они', russianAccusative: 'их', russianDative: 'им', register: 'neutral', conjIndex: 5 },
+  { thai: 'มัน', transcription: 'man', russian: 'оно', russianAccusative: 'его', russianDative: 'ему', register: 'neutral', conjIndex: 2 },
 ];
 
 // ============================================================

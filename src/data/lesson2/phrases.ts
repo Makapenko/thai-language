@@ -65,7 +65,8 @@ export const lesson2PhrasesWithObjects: Phrase[] = generatePhrasesWithObjects(
 // Подбираем глаголы, которые часто используются с дополнениями-лицами
 const verbsWithPronounObjects = allVerbs.filter(v =>
   // Глаголы, которые естественно работают с людьми как дополнениями
-  ['เห็น', 'ช่วย', 'รอ', 'โทร', 'รัก', 'รู้', 'พบ', 'ให้', 'ถาม', 'ตอบ', 'ได้ยิน', 'ต้องการ', 'เข้าใจ'].includes(v.thai)
+  // Примечание: ต้องการ удалён, так как создаёт двусмысленные фразы ("я хочу тебя")
+  ['เห็น', 'ช่วย', 'รอ', 'โทร', 'รัก', 'รู้', 'พบ', 'ให้', 'ถาม', 'ตอบ', 'ได้ยิน', 'เข้าใจ'].includes(v.thai)
 );
 
 export const lesson2PhrasesWithPronounObjects: Phrase[] = generatePhrasesWithPronounObjects(
