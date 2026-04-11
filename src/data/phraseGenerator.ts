@@ -2,6 +2,7 @@ import type { Phrase, SentenceType } from './types';
 import { patterns, patternsWithObject } from './phrasePatterns';
 import { questionPatterns } from './phrasePatterns.lesson2';
 import type { QuestionWord } from './phrasePatterns.lesson2';
+import { isVerbObjectCompatible } from './vocabulary/verbObjectCompatibility';
 
 // Re-export types for backward compatibility
 export type { Subject, Verb, Noun } from './phrasePatterns';
@@ -67,6 +68,11 @@ export function generatePhrasesWithObjects(
     for (const subject of subjects) {
       for (const verb of verbs) {
         for (const noun of nouns) {
+          // Семантическая проверка: пропускаем несовместимые пары глагол-существительное
+          if (!isVerbObjectCompatible(verb.thai, noun.thai)) {
+            continue;
+          }
+
           phrases.push({
             id: `${idPrefix}${lessonId}-${counter++}`,
             russian: pattern.russianTemplate(subject, verb, noun),
@@ -84,13 +90,20 @@ export function generatePhrasesWithObjects(
 }
 
 // Generate question phrases from subjects, verbs, question words, and question pattern types
+// Каждый паттерн использует только своё вопросительное слово (привязка по questionWordThai)
+// verbFilters — опционально: фильтр глаголов для конкретных типов паттернов
+// subjectFilter — опционально: фильтр подлежащих для конкретных типов паттернов
 export function generateQuestionPhrases(
   subjects: Subject[],
   verbs: Verb[],
   questionWords: QuestionWord[],
   patternTypes: SentenceType[],
   lessonId: number,
-  idPrefix: string = 'q'
+  idPrefix: string = 'q',
+  options?: {
+    verbFilters?: { patternType: SentenceType; filterFn: (verb: Verb) => boolean }[];
+    subjectFilter?: { patternType: SentenceType; filterFn: (subject: Subject) => boolean }[];
+  }
 ): Phrase[] {
   const phrases: Phrase[] = [];
   let counter = 1;
@@ -98,9 +111,20 @@ export function generateQuestionPhrases(
   const selectedPatterns = questionPatterns.filter(p => patternTypes.includes(p.type));
 
   for (const pattern of selectedPatterns) {
-    for (const subject of subjects) {
-      for (const verb of verbs) {
-        for (const qw of questionWords) {
+    // Фильтруем: берём только вопросительное слово, которое соответствует этому паттерну
+    const filteredQWs = questionWords.filter(qw => qw.thai === pattern.questionWordThai);
+
+    // Применяем фильтр глаголов, если он задан для этого типа паттерна
+    const verbFilter = options?.verbFilters?.find(f => f.patternType === pattern.type);
+    const filteredVerbs = verbFilter ? verbs.filter(verbFilter.filterFn) : verbs;
+
+    // Применяем фильтр подлежащих, если задан
+    const subjFilter = options?.subjectFilter?.find(f => f.patternType === pattern.type);
+    const filteredSubjects = subjFilter ? subjects.filter(subjFilter.filterFn) : subjects;
+
+    for (const subject of filteredSubjects) {
+      for (const verb of filteredVerbs) {
+        for (const qw of filteredQWs) {
           phrases.push({
             id: `${idPrefix}${lessonId}-${counter++}`,
             russian: pattern.russianTemplate(subject, verb, qw),

@@ -442,6 +442,7 @@
   }
 
   .wrongWordRussian {
-    display: none;
+    font-size: var(--font-size-xs);
+    margin-top: 2px;
   }
 }

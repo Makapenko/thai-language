@@ -92,6 +92,7 @@ export type SentenceType =
   | 'future_negative_obj'      // Я не открою дверь
   | 'continuous_obj'           // Я сейчас открываю дверь
   // Open questions with question words (Lesson 2)
+  | 'question_who_subject'     // ใครมา? — Кто приходит?
   | 'question_who'             // คุณเห็นใคร? — Кого ты видишь?
   | 'question_what'            // คุณทำอะไร? — Что ты делаешь?
   | 'question_when'            // เขาไปเมื่อไหร่? — Когда он поедет?

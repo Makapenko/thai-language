@@ -16,6 +16,8 @@ export interface QuestionWord {
 // ============================================================
 interface QuestionPattern {
   type: SentenceType;
+  /** Какое вопросительное слово использует этот паттерн (по тайскому тексту) */
+  questionWordThai: string;
   russianTemplate: (subject: Subject, verb: Verb, questionWord: QuestionWord) => string;
   buildStructure: (subject: Subject, verb: Verb, questionWord: QuestionWord) => PhraseStructure[];
   buildThai: (subject: Subject, verb: Verb, questionWord: QuestionWord) => string;
@@ -40,13 +42,32 @@ function getSubjectLabel(subject: Subject): string {
 }
 
 // ============================================================
-// QUESTION PATTERNS — открытые вопросы с вопросительными словами (6 штук)
+// QUESTION PATTERNS — открытые вопросы с вопросительными словами
+// Каждый паттерн привязан к КОНКРЕТНОМУ вопросительному слову
 // ============================================================
 export const questionPatterns: QuestionPattern[] = [
-  // question_who: subject + verb + ใคร — Кого ты видишь?
+
+  // ─── Кто? (кто = подлежащее) — ใคร + verb — Кто приходит? ───
+  // В тайском: ใคร = подлежащее, глагол не меняется
+  // В русском: "Кто" = 3-е лицо ед.ч. → глагол в 3-м лице (ест, пьёт, идёт)
+  {
+    type: 'question_who_subject',
+    questionWordThai: 'ใคร',
+    russianTemplate: (_s, v, qw) => `${qw.russian} ${v.present[2]}?`,
+    buildStructure: (_s, v, qw) => [
+      { groupId: 'questionWord', thai: qw.thai, transcription: qw.transcription },
+      { groupId: 'verb', thai: v.thai, transcription: v.transcription },
+    ],
+    buildThai: (_s, v, qw) => `${qw.thai}${v.thai}`,
+    buildTranscription: (_s, v, qw) => `${qw.transcription} ${v.transcription}`,
+  },
+
+  // ─── Кто? (кто = дополнение) — subject + verb + ใคร — Кого ты видишь? ───
   {
     type: 'question_who',
-    russianTemplate: (s, v, qw) => `${getSubjectLabel(s)} ${v.present[s.conjIndex]} ${qw.russian}?`,
+    questionWordThai: 'ใคร',
+    // В русском — "Кого" (винительный падеж), т.к. это дополнение
+    russianTemplate: (s, v, _qw) => `Кого ${getSubjectLabel(s)} ${v.present[s.conjIndex]}?`,
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -56,10 +77,11 @@ export const questionPatterns: QuestionPattern[] = [
     buildTranscription: (s, v, qw) => `${s.transcription} ${v.transcription} ${qw.transcription}`,
   },
 
-  // question_what: subject + verb + อะไร — Что ты делаешь?
+  // ─── Что? — subject + verb + อะไร — Что ты делаешь? ───
   {
     type: 'question_what',
-    russianTemplate: (s, v, qw) => `${getSubjectLabel(s)} ${v.present[s.conjIndex]} ${qw.russian}?`,
+    questionWordThai: 'อะไร',
+    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${v.present[s.conjIndex]}?`,
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -69,10 +91,11 @@ export const questionPatterns: QuestionPattern[] = [
     buildTranscription: (s, v, qw) => `${s.transcription} ${v.transcription} ${qw.transcription}`,
   },
 
-  // question_when: subject + verb + เมื่อไหร่ — Когда он поедет?
+  // ─── Когда? — subject + จะ + verb + เมื่อไหร่ — Когда ты поедешь? ───
   {
     type: 'question_when',
-    russianTemplate: (s, v, qw) => `${getSubjectLabel(s)} ${v.future[s.conjIndex]} ${qw.russian}?`,
+    questionWordThai: 'เมื่อไหร่',
+    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${v.future[s.conjIndex]}?`,
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.future.thai, transcription: TENSE_MARKERS.future.transcription },
@@ -83,10 +106,11 @@ export const questionPatterns: QuestionPattern[] = [
     buildTranscription: (s, v, qw) => `${s.transcription} ${TENSE_MARKERS.future.transcription} ${v.transcription} ${qw.transcription}`,
   },
 
-  // question_where: subject + อยู่ + ที่ไหน — Где ты находишься?
+  // ─── Где? — subject + อยู่ + ที่ไหน — Где ты находишься? ───
   {
     type: 'question_where',
-    russianTemplate: (s, _v, qw) => `${getSubjectLabel(s)} находится ${qw.russian}?`,
+    questionWordThai: 'ที่ไหน',
+    russianTemplate: (s, _v, qw) => `${qw.russian} ${getSubjectLabel(s)} находится?`,
     buildStructure: (s, _v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: 'อยู่', transcription: 'yùu' },
@@ -96,10 +120,11 @@ export const questionPatterns: QuestionPattern[] = [
     buildTranscription: (s, _v, qw) => `${s.transcription} yùu ${qw.transcription}`,
   },
 
-  // question_why: ทำไม + subject + tense + verb — Почему он не пришёл?
+  // ─── Почему? — ทำไม + subject + ไม่ + verb — Почему ты не приходишь? ───
   {
     type: 'question_why',
-    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ไม่ ${v.present[s.conjIndex]}?`,
+    questionWordThai: 'ทำไม',
+    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} не ${v.present[s.conjIndex]}?`,
     buildStructure: (s, v, qw) => [
       { groupId: 'questionWord', thai: qw.thai, transcription: qw.transcription },
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
@@ -110,10 +135,11 @@ export const questionPatterns: QuestionPattern[] = [
     buildTranscription: (s, v, qw) => `${qw.transcription} ${s.transcription} ${TENSE_MARKERS.negativePresent.transcription} ${v.transcription}`,
   },
 
-  // question_how: subject + verb + อย่างไร — Как ты поедешь?
+  // ─── Как? — subject + จะ + verb + อย่างไร — Как ты поедешь? ───
   {
     type: 'question_how',
-    russianTemplate: (s, v, qw) => `${getSubjectLabel(s)} ${v.future[s.conjIndex]} ${qw.russian}?`,
+    questionWordThai: 'อย่างไร',
+    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${v.future[s.conjIndex]}?`,
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.future.thai, transcription: TENSE_MARKERS.future.transcription },

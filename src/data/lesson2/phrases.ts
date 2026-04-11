@@ -61,8 +61,8 @@ export const lesson2PhrasesWithObjects: Phrase[] = generatePhrasesWithObjects(
 
 // 3. Вопросительные фразы с вопросительными словами — тренируем местоимения из урока 1 + урока 2
 const allPronounsForQuestions = [...lesson1Pronouns, ...lesson2Pronouns];
-// 13 pronouns × 10 verbs × 6 questionWords × 6 patterns = 29016 фраз
-// Ограничиваем: берём только selectVerbs (10 глаголов) для разумного размера
+// 13 pronouns × 10 verbs × 7 patterns = 910 фраз
+// Каждый паттерн использует только своё вопросительное слово
 const selectVerbs = allVerbs.slice(0, 10); // первые 10 глаголов
 
 export const lesson2QuestionPhrases: Phrase[] = generateQuestionPhrases(
@@ -70,14 +70,33 @@ export const lesson2QuestionPhrases: Phrase[] = generateQuestionPhrases(
   selectVerbs,
   lesson2QuestionWords,
   [
-    'question_who',
-    'question_what',
-    'question_when',
-    'question_where',
-    'question_why',
-    'question_how',
+    'question_who_subject',   // ใครมา? — Кто приходит?
+    'question_who',           // คุณเห็นใคร? — Кого ты видишь?
+    'question_what',          // คุณทำอะไร? — Что ты делаешь?
+    'question_when',          // เขาไปเมื่อไหร่? — Когда он поедет?
+    'question_where',         // เธออยู่ที่ไหน? — Где ты находишься?
+    'question_why',           // ทำไมคุณไม่มา? — Почему ты не приходишь?
+    'question_how',           // คุณไปอย่างไร? — Как ты поедешь?
   ],
-  2
+  2,
+  'q',
+  {
+    verbFilters: [
+      // question_who: только глаголы, которые могут принимать человека как объект
+      {
+        patternType: 'question_who',
+        filterFn: (v) => ['เห็น', 'รัก', 'รู้'].includes(v.thai),
+      },
+    ],
+    subjectFilter: [
+      // question_who_subject: подлежащее = ใคร, поэтому не зацикливаемся на местоимениях
+      // Берём только первое местоимение-заглушку (реально оно не используется в шаблоне)
+      {
+        patternType: 'question_who_subject',
+        filterFn: (s) => s === allPronounsForQuestions[0],
+      },
+    ],
+  }
 );
 
 // Combined phrases for the lesson

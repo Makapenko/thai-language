@@ -282,11 +282,22 @@ export function PhrasesPage() {
   };
 
   // Get word info for display — searches in current lesson's word groups
+  // For lesson 2, also search in lesson 1 word groups (since phrases use pronouns from both lessons)
   const getWordInfo = (thai: string) => {
+    // First search in current lesson's word groups
     for (const group of wordGroups) {
       const option = group.options.find((opt) => opt.thai === thai);
       if (option) return option;
     }
+    
+    // If not found and we're on lesson 2, also search in lesson 1 word groups
+    if (id === 2) {
+      for (const group of lesson1WordGroups) {
+        const option = group.options.find((opt) => opt.thai === thai);
+        if (option) return option;
+      }
+    }
+    
     return null;
   };
 
