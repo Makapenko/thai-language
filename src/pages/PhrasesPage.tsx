@@ -119,7 +119,7 @@ export function PhrasesPage() {
     // This handles duplicate groupIds (e.g., two 'ending' groups for past questions)
     currentPhrase.structure.forEach((structItem) => {
       const groupId = structItem.groupId;
-      const group = lesson1WordGroups.find((g) => g.id === groupId);
+      const group = wordGroups.find((g) => g.id === groupId);
       if (!group) return;
 
       // The correct answer for this position
@@ -262,9 +262,8 @@ export function PhrasesPage() {
   // Handle next
   const handleNext = () => {
     if (justAdvanced) {
-      // Second mistake - phrase already advanced, just reset UI
-      dispatch(clearSelectedParts());
-      setShowResult(false);
+      // Second mistake - advance to next phrase on button click
+      dispatch(nextPhrase());
     } else if (isRetrying) {
       // First mistake retry - reset UI for another attempt
       dispatch(clearSelectedParts());
@@ -419,36 +418,33 @@ export function PhrasesPage() {
           )}
 
           {showResult && !isCorrect && (
-            <button
-              className={styles.correctAnswerBox}
-              onClick={() =>
-                handleSpeakWord(
-                  currentPhrase.structure.map((s) => s.thai).join('')
-                )
-              }
-            >
+            <div className={styles.correctAnswerBox}>
               <div className={styles.correctAnswerParts}>
                 {currentPhrase.structure.map((part, index) => {
                   const info = getWordInfo(part.thai);
                   return (
-                    <span key={index} className={styles.correctPart}>
+                    <button
+                      key={index}
+                      className={styles.correctPart}
+                      onClick={() => handleSpeakWord(part.thai)}
+                    >
                       <span className={styles.partThai}>{part.thai}</span>
                       {info && (
                         <span className={styles.partTranscription}>
                           {info.transcription}
                         </span>
                       )}
-                    </span>
+                    </button>
                   );
                 })}
               </div>
-            </button>
+            </div>
           )}
 
           {showResult && (
             <div className={styles.result}>
               <Button variant="primary" fullWidth onClick={handleNext}>
-                {isRetrying ? 'Повторить' : 'Далее'}
+                {justAdvanced ? 'Далее' : isRetrying ? 'Повторить' : 'Далее'}
               </Button>
             </div>
           )}

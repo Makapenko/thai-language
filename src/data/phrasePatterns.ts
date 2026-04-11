@@ -77,14 +77,14 @@ interface PatternWithObject {
 // Other pronouns (Он, Она, Мы, Вы, Они) are self-explanatory
 // ============================================================
 function getSubjectLabel(subject: Subject): string {
-  if (subject.russian === 'Я') {
+  if (subject.russian.startsWith('Я')) {
     switch (subject.gender) {
       case 'masc':
-        return `${subject.russian} (муж.)`;
+        return 'Я (муж.)';
       case 'fem':
-        return `${subject.russian} (жен.)`;
+        return 'Я (жен.)';
       default:
-        return subject.russian;
+        return 'Я';
     }
   }
   return subject.russian;

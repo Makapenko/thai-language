@@ -28,18 +28,31 @@ interface QuestionPattern {
 // Helper: get subject label (same as in phrasePatterns.ts)
 // ============================================================
 function getSubjectLabel(subject: Subject): string {
-  if (subject.russian === 'Я') {
+  if (subject.russian.startsWith('Я')) {
     switch (subject.gender) {
       case 'masc':
-        return `${subject.russian} (муж.)`;
+        return 'Я (муж.)';
       case 'fem':
-        return `${subject.russian} (жен.)`;
+        return 'Я (жен.)';
       default:
-        return subject.russian;
+        return 'Я';
     }
   }
   return subject.russian;
 }
+
+// ============================================================
+// Специальный глагол для паттерна «Где?» — находится/нахожусь/находишься и т.д.
+// ============================================================
+const verbYuu: Verb = {
+  thai: 'อยู่',
+  transcription: 'yùu',
+  infinitive: 'находиться',
+  present: ['нахожусь', 'находишься', 'находится', 'находимся', 'находитесь', 'находятся'],
+  past: ['находился', 'находилась', 'находились'],
+  future: ['буду находиться', 'будешь находиться', 'будет находиться', 'будем находиться', 'будете находиться', 'будут находиться'],
+  continuous: ['нахожусь', 'находишься', 'находится', 'находимся', 'находитесь', 'находятся'],
+};
 
 // ============================================================
 // QUESTION PATTERNS — открытые вопросы с вопросительными словами
@@ -110,7 +123,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_where',
     questionWordThai: 'ที่ไหน',
-    russianTemplate: (s, _v, qw) => `${qw.russian} ${getSubjectLabel(s)} находится?`,
+    russianTemplate: (s, _v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${verbYuu.present[s.conjIndex]}?`,
     buildStructure: (s, _v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: 'อยู่', transcription: 'yùu' },

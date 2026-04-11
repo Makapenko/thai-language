@@ -159,17 +159,11 @@ const phrasesSlice = createSlice({
       } else {
         // Wrong answer
         if (state.isRetrying) {
-          // Second mistake - don't add another marker, just move to next phrase
+          // Second mistake - don't add another marker, mark for advance
           state.isRetrying = false;
           state.justAdvanced = true; // Flag: phrase already advanced
-          // Advance to next phrase
-          if (state.currentPhraseIndex < state.phrases.length - 1) {
-            state.currentPhraseIndex += 1;
-          } else {
-            state.exerciseComplete = true;
-          }
-          state.selectedParts = [];
-          state.currentGroupIndex = 0;
+          // Don't advance index here - let handleNext do it on button click
+          // Keep selectedParts so correct answer can be shown
         } else {
           // First mistake - add a red marker and allow retry
           state.exercises.push({
