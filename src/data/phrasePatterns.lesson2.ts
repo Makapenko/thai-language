@@ -1,6 +1,7 @@
 import type { PhraseStructure, SentenceType } from './types';
 import type { Subject, Verb } from './phrasePatterns';
 import { TENSE_MARKERS } from './phrasePatterns';
+import { capitalizeFirst } from '../utils/capitalizeFirst';
 
 // ============================================================
 // QuestionWord — тип для вопросительных слов
@@ -28,14 +29,19 @@ interface QuestionPattern {
 // Helper: get subject label (same as in phrasePatterns.ts)
 // ============================================================
 function getSubjectLabel(subject: Subject): string {
-  if (subject.russian.startsWith('Я')) {
+  if (subject.russian.startsWith('я')) {
+    // Если уже есть пометка (грубое, форм. и т.д.) — использовать как есть
+    if (subject.russian.includes('(')) {
+      return subject.russian;
+    }
+    // Иначе добавить гендерную пометку
     switch (subject.gender) {
       case 'masc':
-        return 'Я (муж.)';
+        return 'я (муж.)';
       case 'fem':
-        return 'Я (жен.)';
+        return 'я (жен.)';
       default:
-        return 'Я';
+        return 'я';
     }
   }
   return subject.russian;
@@ -66,7 +72,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_who_subject',
     questionWordThai: 'ใคร',
-    russianTemplate: (_s, v, qw) => `${qw.russian} ${v.present[2]}?`,
+    russianTemplate: (_s, v, qw) => capitalizeFirst(`${qw.russian} ${v.present[2]}?`),
     buildStructure: (_s, v, qw) => [
       { groupId: 'questionWord', thai: qw.thai, transcription: qw.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -80,7 +86,7 @@ export const questionPatterns: QuestionPattern[] = [
     type: 'question_who',
     questionWordThai: 'ใคร',
     // В русском — "Кого" (винительный падеж), т.к. это дополнение
-    russianTemplate: (s, v, _qw) => `Кого ${getSubjectLabel(s)} ${v.present[s.conjIndex]}?`,
+    russianTemplate: (s, v, _qw) => capitalizeFirst(`Кого ${getSubjectLabel(s)} ${v.present[s.conjIndex]}?`),
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -94,7 +100,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_what',
     questionWordThai: 'อะไร',
-    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${v.present[s.conjIndex]}?`,
+    russianTemplate: (s, v, qw) => capitalizeFirst(`${qw.russian} ${getSubjectLabel(s)} ${v.present[s.conjIndex]}?`),
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: v.thai, transcription: v.transcription },
@@ -108,7 +114,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_when',
     questionWordThai: 'เมื่อไหร่',
-    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${v.future[s.conjIndex]}?`,
+    russianTemplate: (s, v, qw) => capitalizeFirst(`${qw.russian} ${getSubjectLabel(s)} ${v.future[s.conjIndex]}?`),
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.future.thai, transcription: TENSE_MARKERS.future.transcription },
@@ -123,7 +129,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_where',
     questionWordThai: 'ที่ไหน',
-    russianTemplate: (s, _v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${verbYuu.present[s.conjIndex]}?`,
+    russianTemplate: (s, _v, qw) => capitalizeFirst(`${qw.russian} ${getSubjectLabel(s)} ${verbYuu.present[s.conjIndex]}?`),
     buildStructure: (s, _v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'verb', thai: 'อยู่', transcription: 'yùu' },
@@ -137,7 +143,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_why',
     questionWordThai: 'ทำไม',
-    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} не ${v.present[s.conjIndex]}?`,
+    russianTemplate: (s, v, qw) => capitalizeFirst(`${qw.russian} ${getSubjectLabel(s)} не ${v.present[s.conjIndex]}?`),
     buildStructure: (s, v, qw) => [
       { groupId: 'questionWord', thai: qw.thai, transcription: qw.transcription },
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
@@ -152,7 +158,7 @@ export const questionPatterns: QuestionPattern[] = [
   {
     type: 'question_how',
     questionWordThai: 'อย่างไร',
-    russianTemplate: (s, v, qw) => `${qw.russian} ${getSubjectLabel(s)} ${v.future[s.conjIndex]}?`,
+    russianTemplate: (s, v, qw) => capitalizeFirst(`${qw.russian} ${getSubjectLabel(s)} ${v.future[s.conjIndex]}?`),
     buildStructure: (s, v, qw) => [
       { groupId: 'subject', thai: s.thai, transcription: s.transcription },
       { groupId: 'tense', thai: TENSE_MARKERS.future.thai, transcription: TENSE_MARKERS.future.transcription },

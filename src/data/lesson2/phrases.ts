@@ -2,16 +2,18 @@ import type { Phrase, WordGroup } from '../types';
 import {
   generatePhrases,
   generatePhrasesWithObjects,
+  generatePhrasesWithPronounObjects,
   generateQuestionPhrases,
 } from '../phraseGenerator';
-import { pronouns as lesson1Pronouns, verbs as lesson1Verbs, nouns as lesson1Nouns } from '../vocabulary/lessons/lesson1';
-import { pronouns as lesson2Pronouns, questionWords as lesson2QuestionWords } from '../vocabulary/lessons/lesson2';
+import { pronouns as lesson1Pronouns, verbs as lesson1Verbs, nouns as lesson1Nouns, objectPronouns as lesson1ObjectPronouns } from '../vocabulary/lessons/lesson1';
+import { pronouns as lesson2Pronouns, questionWords as lesson2QuestionWords, objectPronouns as lesson2ObjectPronouns } from '../vocabulary/lessons/lesson2';
 
 // ============================================================
 // Словарь для урока 2
 // ============================================================
 const allVerbs = lesson1Verbs; // глаголы только из урока 1
 const allNouns = lesson1Nouns; // существительные только из урока 1
+const allObjectPronouns = [...lesson1ObjectPronouns, ...lesson2ObjectPronouns]; // все местоимения-дополнения
 
 // ============================================================
 // Фразы урока 2 — генерируются автоматически
@@ -55,6 +57,30 @@ export const lesson2PhrasesWithObjects: Phrase[] = generatePhrasesWithObjects(
     'future_affirmative_obj',
     'future_negative_obj',
     'continuous_obj',
+  ],
+  2
+);
+
+// 2.5 Фразы с местоимениями-объектами — тренируем местоимения из урока 2 как подлежащие + все местоимения-дополнения
+// Подбираем глаголы, которые часто используются с дополнениями-лицами
+const verbsWithPronounObjects = allVerbs.filter(v =>
+  // Глаголы, которые естественно работают с людьми как дополнениями
+  ['เห็น', 'ช่วย', 'รอ', 'โทร', 'รัก', 'รู้', 'พบ', 'ให้', 'ถาม', 'ตอบ', 'ได้ยิน', 'ต้องการ', 'เข้าใจ'].includes(v.thai)
+);
+
+export const lesson2PhrasesWithPronounObjects: Phrase[] = generatePhrasesWithPronounObjects(
+  lesson2Pronouns,  // подлежащие из урока 2
+  verbsWithPronounObjects,  // глаголы, подходящие для дополнений-лиц
+  allObjectPronouns, // все местоимения-дополнения (урок 1 + урок 2)
+  [
+    'present_affirmative_obj_pron',
+    'present_negative_obj_pron',
+    'present_question_obj_pron',
+    'past_affirmative_obj_pron',
+    'past_negative_obj_pron',
+    'future_affirmative_obj_pron',
+    'future_negative_obj_pron',
+    'continuous_obj_pron',
   ],
   2
 );
@@ -103,6 +129,7 @@ export const lesson2QuestionPhrases: Phrase[] = generateQuestionPhrases(
 export const lesson2AllPhrases: Phrase[] = [
   ...lesson2Phrases,
   ...lesson2PhrasesWithObjects,
+  ...lesson2PhrasesWithPronounObjects,
   ...lesson2QuestionPhrases,
 ];
 
@@ -135,8 +162,13 @@ export const lesson2WordGroups: WordGroup[] = [
   },
   {
     id: 'object',
-    name: 'Объект',
+    name: 'Объект (сущ.)',
     options: allNouns.map(n => ({ thai: n.thai, transcription: n.transcription, russian: n.russian })),
+  },
+  {
+    id: 'objectPronoun',
+    name: 'Объект (мест.)',
+    options: allObjectPronouns.map(p => ({ thai: p.thai, transcription: p.transcription, russian: p.russianAccusative })),
   },
   {
     id: 'questionWord',

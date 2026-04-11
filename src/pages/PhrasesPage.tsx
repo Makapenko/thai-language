@@ -6,7 +6,13 @@ import { PhraseProgressBar } from '../components/PhraseProgressBar';
 import { TheoryModal } from '../components/TheoryModal/TheoryModal';
 import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { lesson1Phrases, lesson1WordGroups } from '../data/lesson1';
-import { lesson2AllPhrases, lesson2WordGroups } from '../data/lesson2/phrases';
+import {
+  lesson2WordGroups,
+  lesson2Phrases,
+  lesson2PhrasesWithObjects,
+  lesson2PhrasesWithPronounObjects,
+  lesson2QuestionPhrases,
+} from '../data/lesson2/phrases';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setPhrases,
@@ -66,6 +72,35 @@ export function PhrasesPage() {
   const dispatch = useAppDispatch();
   const id = parseInt(lessonId || '1', 10);
 
+  // Phrase type selection state (lesson 2 only)
+  const [started, setStarted] = useState(false);
+  const [checked, setChecked] = useState<Record<string, boolean>>({
+    standard: true,
+    withObjects: true,
+    withPronounObjects: true,
+    questions: true,
+  });
+
+  const toggle = (type: string) => {
+    setChecked((prev) => ({ ...prev, [type]: !prev[type] }));
+  };
+
+  const handleStart = () => {
+    const activeTypes = Object.entries(checked)
+      .filter(([, v]) => v)
+      .map(([k]) => k);
+
+    if (activeTypes.length === 0) {
+      alert('Выберите хотя бы один тип предложений для упражнения.');
+      return;
+    }
+
+    setSelectedTypes(activeTypes);
+    setStarted(true);
+  };
+
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(['standard', 'withObjects', 'withPronounObjects', 'questions']);
+
   // Timer component ID for phrases section
   const timerComponentId = `lesson-${id}-phrases`;
 
@@ -97,7 +132,23 @@ export function PhrasesPage() {
     let wordGroups: typeof lesson1WordGroups;
 
     if (id === 2) {
-      phrases = lesson2AllPhrases;
+      // Filter lesson 2 phrases based on selected types
+      const filteredPhrases: typeof lesson2Phrases = [];
+
+      if (selectedTypes.includes('standard')) {
+        filteredPhrases.push(...lesson2Phrases);
+      }
+      if (selectedTypes.includes('withObjects')) {
+        filteredPhrases.push(...lesson2PhrasesWithObjects);
+      }
+      if (selectedTypes.includes('withPronounObjects')) {
+        filteredPhrases.push(...lesson2PhrasesWithPronounObjects);
+      }
+      if (selectedTypes.includes('questions')) {
+        filteredPhrases.push(...lesson2QuestionPhrases);
+      }
+
+      phrases = filteredPhrases;
       wordGroups = lesson2WordGroups;
     } else {
       phrases = lesson1Phrases;
@@ -107,7 +158,7 @@ export function PhrasesPage() {
     const shuffledPhrases = shuffle(phrases.filter((p) => p.lessonId === id));
     dispatch(setPhrases(shuffledPhrases));
     dispatch(setWordGroups(wordGroups));
-  }, [dispatch, id]);
+  }, [dispatch, id, selectedTypes]);
 
   // Generate options for current phrase
   useEffect(() => {
@@ -341,6 +392,14 @@ export function PhrasesPage() {
             </div>
           </div>
           <div className={styles.completeActions}>
+            {id === 2 && (
+              <Button
+                variant="ghost"
+                onClick={() => setStarted(false)}
+              >
+                Изменить типы
+              </Button>
+            )}
             <Button
               variant="secondary"
               onClick={() => navigate(`/lesson/${id}`)}
@@ -352,6 +411,59 @@ export function PhrasesPage() {
             </Button>
           </div>
         </Card>
+      </div>
+    );
+  }
+
+  // Start screen for lesson 2 — phrase type selection
+  if (id === 2 && !started) {
+    const PHRASE_TYPE_LABELS: Record<string, string> = {
+      standard: 'Стандартные',
+      withObjects: 'С объектами (сущ.)',
+      withPronounObjects: 'С местоимениями-объектами',
+      questions: 'Вопросительные',
+    };
+
+    const anyChecked = Object.values(checked).some((v) => v);
+
+    return (
+      <div className={styles.pageWrapper}>
+        <div className={styles.container}>
+          <Card variant="elevated" className={styles.startCard}>
+            <h2 className={styles.startTitle}>Составление фраз</h2>
+            <p className={styles.startSubtitle}>Выберите типы предложений:</p>
+            <div className={styles.startCheckboxes}>
+              {(Object.keys(checked) as string[]).map((type) => (
+                <label key={type} className={styles.startLabel}>
+                  <input
+                    type="checkbox"
+                    checked={checked[type]}
+                    onChange={() => toggle(type)}
+                    className={styles.startCheckbox}
+                  />
+                  {PHRASE_TYPE_LABELS[type]}
+                </label>
+              ))}
+            </div>
+            <Button
+              variant="primary"
+              size="lg"
+              fullWidth
+              onClick={handleStart}
+              disabled={!anyChecked}
+            >
+              Начать
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              fullWidth
+              onClick={() => navigate(`/lesson/${id}`)}
+            >
+              Назад
+            </Button>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -506,6 +618,7 @@ export function PhrasesPage() {
       <TheoryModal
         isOpen={showTheoryModal}
         onClose={() => setShowTheoryModal(false)}
+        lessonId={id}
       />
     </div>
   );

@@ -1,4 +1,4 @@
-import type { Subject, Verb, Noun } from '../../phrasePatterns';
+import type { Subject, Verb, Noun, ObjectPronoun } from '../../phrasePatterns';
 
 // ============================================================
 // СЛОВА УРОКА 1
@@ -7,14 +7,14 @@ import type { Subject, Verb, Noun } from '../../phrasePatterns';
 
 // subjects — строки 6-18 из phrases.ts
 export const pronouns: Subject[] = [
-  { thai: 'ผม', transcription: 'pǒm', russian: 'Я', conjIndex: 0, gender: 'masc' },
-  { thai: 'ฉัน', transcription: 'chǎn', russian: 'Я', conjIndex: 0, gender: 'fem' },
-  { thai: 'คุณ', transcription: 'kun', russian: 'Ты', conjIndex: 1, gender: 'masc' },
-  { thai: 'เขา', transcription: 'kǎo', russian: 'Он', conjIndex: 2, gender: 'masc' },
-  { thai: 'เขา', transcription: 'kǎo', russian: 'Она', conjIndex: 2, gender: 'fem' },
-  { thai: 'เรา', transcription: 'rao', russian: 'Мы', conjIndex: 3, gender: 'plural' },
-  { thai: 'คุณ', transcription: 'kun', russian: 'Вы', conjIndex: 4, gender: 'plural' },
-  { thai: 'พวกเขา', transcription: 'pûak-kǎo', russian: 'Они', conjIndex: 5, gender: 'plural' },
+  { thai: 'ผม', transcription: 'pǒm', russian: 'я', conjIndex: 0, gender: 'masc' },
+  { thai: 'ฉัน', transcription: 'chǎn', russian: 'я', conjIndex: 0, gender: 'fem' },
+  { thai: 'คุณ', transcription: 'kun', russian: 'ты', conjIndex: 1, gender: 'masc' },
+  { thai: 'เขา', transcription: 'kǎo', russian: 'он', conjIndex: 2, gender: 'masc' },
+  { thai: 'เขา', transcription: 'kǎo', russian: 'она', conjIndex: 2, gender: 'fem' },
+  { thai: 'เรา', transcription: 'rao', russian: 'мы', conjIndex: 3, gender: 'plural' },
+  { thai: 'คุณ', transcription: 'kun', russian: 'вы', conjIndex: 4, gender: 'plural' },
+  { thai: 'พวกเขา', transcription: 'pûak-kǎo', russian: 'они', conjIndex: 5, gender: 'plural' },
 ];
 
 // verbs — строки 20-573 из phrases.ts
@@ -587,6 +587,23 @@ export const nouns: Noun[] = [
   { thai: 'เก้าอี้', transcription: 'gâo-îi', russian: 'стул', russianAccusative: 'стул' },
   { thai: 'พื้น', transcription: 'púen', russian: 'пол', russianAccusative: 'пол' },
   { thai: 'กำแพง', transcription: 'gam-paeng', russian: 'стена', russianAccusative: 'стену' },
+];
+
+// ============================================================
+// Object Pronouns — местоимения в роли дополнения
+// Те же слова, что и pronouns, но используются как объекты (меня, тебя, его и т.д.)
+// Разделяем многозначные местоимения на отдельные записи для ясности
+// ============================================================
+export const objectPronouns: ObjectPronoun[] = [
+  { thai: 'ผม', transcription: 'pǒm', russian: 'я (муж.)', russianAccusative: 'меня' },
+  { thai: 'ฉัน', transcription: 'chǎn', russian: 'я (жен.)', russianAccusative: 'меня' },
+  { thai: 'คุณ', transcription: 'kun', russian: 'ты', russianAccusative: 'тебя' },
+  { thai: 'คุณ', transcription: 'kun', russian: 'вы', russianAccusative: 'вас' },
+  { thai: 'เขา', transcription: 'kǎo', russian: 'он', russianAccusative: 'его' },
+  { thai: 'เขา', transcription: 'kǎo', russian: 'она', russianAccusative: 'её' },
+  { thai: 'เรา', transcription: 'rao', russian: 'мы', russianAccusative: 'нас' },
+  { thai: 'พวกเขา', transcription: 'pûak-kǎo', russian: 'они', russianAccusative: 'их' },
+  { thai: 'มัน', transcription: 'man', russian: 'оно', russianAccusative: 'его' },
 ];
 
 // ============================================================

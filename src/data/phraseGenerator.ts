@@ -1,23 +1,23 @@
 import type { Phrase, SentenceType } from './types';
-import { patterns, patternsWithObject } from './phrasePatterns';
+import { patterns, patternsWithObject, patternsWithPronounObject } from './phrasePatterns';
 import { questionPatterns } from './phrasePatterns.lesson2';
 import type { QuestionWord } from './phrasePatterns.lesson2';
 import { isVerbObjectCompatible } from './vocabulary/verbObjectCompatibility';
 
 // Re-export types for backward compatibility
-export type { Subject, Verb, Noun } from './phrasePatterns';
+export type { Subject, Verb, Noun, ObjectPronoun } from './phrasePatterns';
 
 // Re-export question types for lesson 2
 export type { QuestionWord } from './phrasePatterns.lesson2';
 
 // Re-export from phrasePatterns for consumers
-export { TENSE_MARKERS, ENDINGS, patterns, patternsWithObject } from './phrasePatterns';
+export { TENSE_MARKERS, ENDINGS, patterns, patternsWithObject, patternsWithPronounObject } from './phrasePatterns';
 
 // Re-export question patterns for consumers
 export { questionPatterns } from './phrasePatterns.lesson2';
 
 // Import types for internal use
-import type { Subject, Verb, Noun } from './phrasePatterns';
+import type { Subject, Verb, Noun, ObjectPronoun } from './phrasePatterns';
 
 // Generate phrases from subjects, verbs, and pattern types
 export function generatePhrases(
@@ -131,6 +131,40 @@ export function generateQuestionPhrases(
             thai: pattern.buildThai(subject, verb, qw),
             transcription: pattern.buildTranscription(subject, verb, qw),
             structure: pattern.buildStructure(subject, verb, qw),
+            lessonId,
+          });
+        }
+      }
+    }
+  }
+
+  return phrases;
+}
+
+// Generate phrases with pronoun objects from subjects, verbs, object pronouns, and pattern types
+export function generatePhrasesWithPronounObjects(
+  subjects: Subject[],
+  verbs: Verb[],
+  objectPronouns: ObjectPronoun[],
+  patternTypes: SentenceType[],
+  lessonId: number,
+  idPrefix: string = 'pop'
+): Phrase[] {
+  const phrases: Phrase[] = [];
+  let counter = 1;
+
+  const selectedPatterns = patternsWithPronounObject.filter(p => patternTypes.includes(p.type));
+
+  for (const pattern of selectedPatterns) {
+    for (const subject of subjects) {
+      for (const verb of verbs) {
+        for (const objectPronoun of objectPronouns) {
+          phrases.push({
+            id: `${idPrefix}${lessonId}-${counter++}`,
+            russian: pattern.russianTemplate(subject, verb, objectPronoun),
+            thai: pattern.buildThai(subject, verb, objectPronoun),
+            transcription: pattern.buildTranscription(subject, verb, objectPronoun),
+            structure: pattern.buildStructure(subject, verb, objectPronoun),
             lessonId,
           });
         }

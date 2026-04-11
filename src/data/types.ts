@@ -91,6 +91,15 @@ export type SentenceType =
   | 'future_affirmative_obj'   // Я открою дверь
   | 'future_negative_obj'      // Я не открою дверь
   | 'continuous_obj'           // Я сейчас открываю дверь
+  // With object pronoun (Lesson 2)
+  | 'present_affirmative_obj_pron'   // Я вижу тебя
+  | 'present_negative_obj_pron'      // Я не вижу тебя
+  | 'present_question_obj_pron'      // Ты видишь меня?
+  | 'past_affirmative_obj_pron'      // Я видел тебя
+  | 'past_negative_obj_pron'         // Я не видел тебя
+  | 'future_affirmative_obj_pron'    // Я увижу тебя
+  | 'future_negative_obj_pron'       // Я не увижу тебя
+  | 'continuous_obj_pron'            // Я сейчас вижу тебя
   // Open questions with question words (Lesson 2)
   | 'question_who_subject'     // ใครมา? — Кто приходит?
   | 'question_who'             // คุณเห็นใคร? — Кого ты видишь?

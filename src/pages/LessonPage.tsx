@@ -1,6 +1,5 @@
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
-import { Button } from '../components/Button';
 import { ProgressBar } from '../components/ProgressBar';
 import { lessons as lessons1, lesson1Words, lesson1Phrases, lesson1Theory } from '../data/lesson1';
 import { lesson2, lesson2Words, lesson2Theory } from '../data/lesson2';
@@ -145,16 +144,6 @@ export function LessonPage() {
         })}
       </section>
 
-      <section className={styles.actions}>
-        <Button
-          variant="primary"
-          size="lg"
-          fullWidth
-          onClick={() => navigate(`/lesson/${id}/theory`)}
-        >
-          Начать урок
-        </Button>
-      </section>
     </div>
   );
 }
