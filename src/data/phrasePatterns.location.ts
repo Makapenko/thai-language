@@ -24,7 +24,7 @@ function getRussianLocationForm(verb: Verb, location: Location): string {
  * Get the Thai location part — just the city/country name (for audio lookup)
  * The prefix ที่ is appended to the verb in buildThai
  */
-function getThaiLocationPart(verb: Verb, location: Location): string {
+function getThaiLocationPart(_verb: Verb, location: Location): string {
   return location.thai; // just the city name: กรุงเทพ
 }
 

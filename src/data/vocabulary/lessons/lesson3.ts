@@ -1,4 +1,4 @@
-import type { Subject, Verb, ObjectPronoun } from '../../phrasePatterns';
+import type { Subject, Verb } from '../../phrasePatterns';
 import type { LocationComplement, IdentityComplement } from '../../phrasePatterns.lesson3';
 
 // ============================================================
@@ -61,7 +61,7 @@ export const stateVerbs: Verb[] = [
 
 export const locationComplements: LocationComplement[] = [
   { thai: 'บ้าน', transcription: 'bâan', russian: 'дом', russianPrepositional: 'дома' },
-  { thai: 'โรงเรียน', transcription: 'roong-rian', russian: 'школа', russianPreposential: 'в школе' },
+  { thai: 'โรงเรียน', transcription: 'roong-rian', russian: 'школа', russianPrepositional: 'в школе' },
   { thai: 'พิพิธภัณฑ์', transcription: 'phí-pít-tá-pan', russian: 'музей', russianPrepositional: 'в музее' },
   { thai: 'ห้อง', transcription: 'hông', russian: 'комната', russianPrepositional: 'в комнате' },
   { thai: 'รถ', transcription: 'rót', russian: 'машина', russianPrepositional: 'в машине' },

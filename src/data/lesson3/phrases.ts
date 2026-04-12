@@ -1,4 +1,4 @@
-import type { Phrase, PhraseStructure, WordGroup } from '../../types';
+import type { Phrase, WordGroup } from '../types';
 import { pronouns, stateVerbs, locationComplements, identityComplements } from '../vocabulary/lessons/lesson3';
 import { stateLocationPatterns, stateIdentityPatterns } from '../phrasePatterns.lesson3';
 import { shufflePhrases } from '../phraseGenerator';

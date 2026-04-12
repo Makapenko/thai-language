@@ -48,16 +48,17 @@ interface StateIdentityPattern {
 // HELPERS
 // ============================================================
 
+// NOTE: These helper functions are kept for future reference but currently unused
 // Get correct Russian location form based on tense
-function getRussianLocationForm(verb: Verb, location: LocationComplement, tenseMarker: string): string {
-  // For อยู่, always use prepositional case
-  return location.russianPrepositional;
-}
+// function _getRussianLocationForm(_verb: Verb, location: LocationComplement, _tenseMarker: string): string {
+//   // For อยู่, always use prepositional case
+//   return location.russianPrepositional;
+// }
 
 // Check if verb is อยู่ — needs special handling
-function isVerbYuu(verbThai: string): boolean {
-  return verbThai === 'อยู่';
-}
+// function _isVerbYuu(_verbThai: string): boolean {
+//   return _verbThai === 'อยู่';
+// }
 
 // ============================================================
 // LOCATION PATTERNS (สำหรับ อยู่ + место) — 10 паттернов
@@ -214,9 +215,9 @@ export const stateIdentityPatterns: StateIdentityPattern[] = [
   // 1. Affirmative: Я учитель
   {
     type: 'present_affirmative',
-    russianTemplate: (subject, verb, complement) => {
+    russianTemplate: (subject, _verb, complement) => {
       // สำหรับ เป็น используем творительный падеж если есть
-      if (verb === 'เป็น' && complement.includes('учител')) {
+      if (_verb === 'เป็น' && complement.includes('учител')) {
         return `${subject} — учитель`;
       }
       return `${subject} — ${complement}`;
@@ -233,7 +234,7 @@ export const stateIdentityPatterns: StateIdentityPattern[] = [
   // 2. Negative: Я не учитель
   {
     type: 'present_negative',
-    russianTemplate: (subject, verb, complement) => `${subject} не ${complement}`,
+    russianTemplate: (subject, _verb, complement) => `${subject} не ${complement}`,
     buildStructure: (subject, verb, complement) => [
       { groupId: 'subjects', thai: subject.thai, transcription: subject.transcription },
       { groupId: 'stateVerbs', thai: TENSE_MARKERS.negativePresent.thai, transcription: TENSE_MARKERS.negativePresent.transcription },
@@ -247,7 +248,7 @@ export const stateIdentityPatterns: StateIdentityPattern[] = [
   // 3. Question: Ты учитель?
   {
     type: 'present_question',
-    russianTemplate: (subject, verb, complement) => `${subject} — ${complement}?`,
+    russianTemplate: (subject, _verb, complement) => `${subject} — ${complement}?`,
     buildStructure: (subject, verb, complement) => [
       { groupId: 'subjects', thai: subject.thai, transcription: subject.transcription },
       { groupId: 'stateVerbs', thai: verb.thai, transcription: verb.transcription },
