@@ -13,6 +13,10 @@ export type { Location } from './vocabulary/locations';
 // Re-export question types for lesson 2
 export type { QuestionWord } from './phrasePatterns.lesson2';
 
+// Re-export name helpers for lesson 2
+export { nameToSubject, nameToObjectPronoun } from './vocabulary/names';
+export type { Name } from './vocabulary/names';
+
 // Re-export from phrasePatterns for consumers
 export { TENSE_MARKERS, ENDINGS, patterns, patternsWithObject, patternsWithPronounObject } from './phrasePatterns';
 

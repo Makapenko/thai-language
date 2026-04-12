@@ -4,9 +4,12 @@ import {
   generatePhrasesWithObjects,
   generatePhrasesWithPronounObjects,
   generateQuestionPhrases,
+  nameToSubject,
+  nameToObjectPronoun,
 } from '../phraseGenerator';
 import { pronouns as lesson1Pronouns, verbs as lesson1Verbs, nouns as lesson1Nouns, objectPronouns as lesson1ObjectPronouns } from '../vocabulary/lessons/lesson1';
 import { pronouns as lesson2Pronouns, questionWords as lesson2QuestionWords, objectPronouns as lesson2ObjectPronouns } from '../vocabulary/lessons/lesson2';
+import { allNames } from '../vocabulary/names';
 
 // ============================================================
 // Словарь для урока 2
@@ -15,14 +18,24 @@ const allVerbs = lesson1Verbs; // глаголы только из урока 1
 const allNouns = lesson1Nouns; // существительные только из урока 1
 const allObjectPronouns = [...lesson1ObjectPronouns, ...lesson2ObjectPronouns]; // все местоимения-дополнения
 
+// Имена как подлежащие и объекты
+const nameSubjects = allNames.map(nameToSubject);
+const nameObjects = allNames.map(nameToObjectPronoun);
+
+// Подлежащие: местоимения урока 2 + имена
+const subjectsWithNames = [...lesson2Pronouns, ...nameSubjects];
+
+// Местоимения-объекты + имена
+const allObjectPronounsWithNames = [...allObjectPronouns, ...nameObjects];
+
 // ============================================================
 // Фразы урока 2 — генерируются автоматически
 // ============================================================
 
-// 1. Стандартные фразы — тренируем ТОЛЬКО новые местоимения из урока 2
-// 5 pronouns × 62 verbs × 10 patterns = 3100 фраз
+// 1. Стандартные фразы — тренируем новые местоимения из урока 2 + тайские имена
+// (5 pronouns + 8 names) × 62 verbs × 10 patterns = 8060 фраз
 export const lesson2Phrases: Phrase[] = generatePhrases(
-  lesson2Pronouns,
+  subjectsWithNames,
   allVerbs,
   [
     'present_affirmative',
@@ -39,13 +52,13 @@ export const lesson2Phrases: Phrase[] = generatePhrases(
   2
 );
 
-// 2. Фразы с объектами (существительные) — тренируем ТОЛЬКО новые местоимения из урока 2
+// 2. Фразы с объектами (существительные) — тренируем новые местоимения из урока 2 + тайские имена
 const transitiveVerbs = allVerbs.filter(v =>
   ['เปิด', 'ปิด', 'เห็น', 'ดู', 'ซื้อ', 'ทำ', 'เปลี่ยน', 'สร้าง', 'หา', 'ตัด'].includes(v.thai)
 );
 
 export const lesson2PhrasesWithObjects: Phrase[] = generatePhrasesWithObjects(
-  lesson2Pronouns,
+  subjectsWithNames,
   transitiveVerbs,
   allNouns,
   [
@@ -61,7 +74,7 @@ export const lesson2PhrasesWithObjects: Phrase[] = generatePhrasesWithObjects(
   2
 );
 
-// 2.5 Фразы с местоимениями-объектами — тренируем местоимения из урока 2 как подлежащие + все местоимения-дополнения
+// 2.5 Фразы с местоимениями-объектами — тренируем местоимения из урока 2 как подлежащие + все местоимения-дополнения + имена
 // Подбираем глаголы, которые часто используются с дополнениями-лицами
 const verbsWithPronounObjects = allVerbs.filter(v =>
   // Глаголы, которые естественно работают с людьми как дополнениями
@@ -70,9 +83,9 @@ const verbsWithPronounObjects = allVerbs.filter(v =>
 );
 
 export const lesson2PhrasesWithPronounObjects: Phrase[] = generatePhrasesWithPronounObjects(
-  lesson2Pronouns,  // подлежащие из урока 2
-  verbsWithPronounObjects,  // глаголы, подходящие для дополнений-лиц
-  allObjectPronouns, // все местоимения-дополнения (урок 1 + урок 2)
+  subjectsWithNames,              // подлежащие (местоимения урока 2 + имена)
+  verbsWithPronounObjects,        // глаголы, подходящие для дополнений-лиц
+  allObjectPronounsWithNames,     // объекты (все местоимения + имена)
   [
     'present_affirmative_obj_pron',
     'present_negative_obj_pron',
@@ -86,9 +99,9 @@ export const lesson2PhrasesWithPronounObjects: Phrase[] = generatePhrasesWithPro
   2
 );
 
-// 3. Вопросительные фразы с вопросительными словами — тренируем местоимения из урока 1 + урока 2
-const allPronounsForQuestions = [...lesson1Pronouns, ...lesson2Pronouns];
-// 13 pronouns × 10 verbs × 7 patterns = 910 фраз
+// 3. Вопросительные фразы с вопросительными словами — тренируем местоимения из урока 1 + урока 2 + имена
+const allPronounsForQuestions = [...lesson1Pronouns, ...lesson2Pronouns, ...nameSubjects];
+// (13 pronouns + 8 names) × 10 verbs × 7 patterns = 1470 фраз
 // Каждый паттерн использует только своё вопросительное слово
 const selectVerbs = allVerbs.slice(0, 10); // первые 10 глаголов
 
@@ -145,6 +158,11 @@ export const lesson2WordGroups: WordGroup[] = [
     options: lesson2Pronouns.map(s => ({ thai: s.thai, transcription: s.transcription, russian: s.russian })),
   },
   {
+    id: 'name',
+    name: 'Имя',
+    options: allNames.map(n => ({ thai: n.thai, transcription: n.transcription, russian: n.russian })),
+  },
+  {
     id: 'tense',
     name: 'Время/Отрицание',
     options: [
@@ -168,8 +186,8 @@ export const lesson2WordGroups: WordGroup[] = [
   },
   {
     id: 'objectPronoun',
-    name: 'Объект (мест.)',
-    options: allObjectPronouns.map(p => ({ thai: p.thai, transcription: p.transcription, russian: p.russianAccusative })),
+    name: 'Объект (мест./имя)',
+    options: allObjectPronounsWithNames.map(p => ({ thai: p.thai, transcription: p.transcription, russian: p.russianAccusative })),
   },
   {
     id: 'questionWord',

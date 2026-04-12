@@ -9,6 +9,7 @@
 
 import { lesson2Words } from '../src/data/lesson2/words.js';
 import { lesson1Words } from '../src/data/lesson1/words.js';
+import { allNames } from '../src/data/vocabulary/names.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -191,6 +192,13 @@ async function main(): Promise<void> {
 
   console.log(`\n✅ Lesson 2 Words: ${wordStats.success}/${lesson2Words.length} generated`);
 
+  // Names audio
+  const nameItems = allNames.map((n, i) => ({ id: `n${i + 1}`, thai: n.thai }));
+  const nameStats = await processItems(nameItems, 'names');
+  allFailedItems.push(...nameStats.failedItems);
+
+  console.log(`\n✅ Names: ${nameStats.success}/${allNames.length} generated`);
+
   if (allFailedItems.length > 0) {
     const retryResult = await retryFailed(allFailedItems);
 
@@ -206,8 +214,8 @@ async function main(): Promise<void> {
     }
   }
 
-  const totalItems = lesson1Words.length + lesson2Words.length;
-  const totalSuccess = lesson1Stats.success + wordStats.success;
+  const totalItems = lesson1Words.length + lesson2Words.length + allNames.length;
+  const totalSuccess = lesson1Stats.success + wordStats.success + nameStats.success;
   const totalFailed = allFailedItems.length;
 
   console.log('\n' + '='.repeat(60));
