@@ -30,5 +30,5 @@ gift
 cake
 cup
 tea
-drink
+drink (напиток)
 film

@@ -6,6 +6,7 @@ import { ProgressBar } from '../components/ProgressBar';
 import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
 import { lesson1Words } from '../data/lesson1';
 import { lesson2Words } from '../data/lesson2';
+import { lesson3Words } from '../data/lesson3';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setWords,
@@ -29,6 +30,7 @@ import styles from './WordsPage.module.css';
 const OPTIONS_COUNT = 6;
 
 function getLessonWords(id: number): Word[] {
+  if (id === 3) return lesson3Words;
   if (id === 2) return lesson2Words;
   return lesson1Words;
 }

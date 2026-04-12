@@ -13,6 +13,12 @@ import {
   lesson2PhrasesWithPronounObjects,
   lesson2QuestionPhrases,
 } from '../data/lesson2/phrases';
+import {
+  lesson3WordGroups,
+  lesson3LocationPhrases,
+  lesson3IdentityPhrases,
+  lesson3AllPhrases,
+} from '../data/lesson3';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import {
   setPhrases,
@@ -37,6 +43,7 @@ import { speakThai, speakThaiPhrase } from '../utils/speech';
 import { shuffle } from '../utils/shuffle';
 import { lesson1Words } from '../data/lesson1/words';
 import { lesson2Words } from '../data/lesson2/words';
+import { lesson3Words } from '../data/lesson3/words';
 import styles from './PhrasesPage.module.css';
 
 // Статус слова в списке ошибок
@@ -53,7 +60,7 @@ interface WrongWord {
 const OPTIONS_PER_GROUP = 4;
 
 // Combined words from all lessons
-const allLessonWords = [...lesson1Words, ...lesson2Words];
+const allLessonWords = [...lesson1Words, ...lesson2Words, ...lesson3Words];
 
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
@@ -88,6 +95,10 @@ export function PhrasesPage() {
       withObjects: 'С объектами (сущ.)',
       withPronounObjects: 'С местоимениями-объектами',
       questions: 'Вопросительные',
+    },
+    3: {
+      stateLocation: 'Находиться (где?)',
+      stateIdentity: 'Быть (кем?)',
     },
   };
 
@@ -148,7 +159,20 @@ export function PhrasesPage() {
     let phrases: typeof lesson1Phrases;
     let wordGroups: typeof lesson1WordGroups;
 
-    if (id === 2) {
+    if (id === 3) {
+      // Filter lesson 3 phrases based on selected types
+      const filteredPhrases: typeof lesson3AllPhrases = [];
+
+      if (selectedTypes.includes('stateLocation')) {
+        filteredPhrases.push(...lesson3LocationPhrases);
+      }
+      if (selectedTypes.includes('stateIdentity')) {
+        filteredPhrases.push(...lesson3IdentityPhrases);
+      }
+
+      phrases = filteredPhrases;
+      wordGroups = lesson3WordGroups;
+    } else if (id === 2) {
       // Filter lesson 2 phrases based on selected types
       const filteredPhrases: typeof lesson2Phrases = [];
 
@@ -206,8 +230,12 @@ export function PhrasesPage() {
       // The correct answer for this position
       const correctPart = structItem;
 
-      // Get other options from the group
-      const otherOptions = group.options
+      // Get other options from the group - deduplicate by thai text first
+      const uniqueOptions = Array.from(
+        new Map(group.options.map(opt => [opt.thai, opt])).values()
+      );
+
+      const otherOptions = uniqueOptions
         .filter((opt) => opt.thai !== correctPart.thai)
         .map((opt) => opt.thai);
 
@@ -368,14 +396,14 @@ export function PhrasesPage() {
   };
 
   // Get word info for display — searches in current lesson's word groups
-  // For lesson 2, also search in lesson 1 word groups (since phrases use pronouns from both lessons)
+  // For lesson 2 and 3, also search in previous lessons' word groups
   const getWordInfo = (thai: string) => {
     // First search in current lesson's word groups
     for (const group of wordGroups) {
       const option = group.options.find((opt) => opt.thai === thai);
       if (option) return option;
     }
-    
+
     // If not found and we're on lesson 2, also search in lesson 1 word groups
     if (id === 2) {
       for (const group of lesson1WordGroups) {
@@ -383,7 +411,19 @@ export function PhrasesPage() {
         if (option) return option;
       }
     }
-    
+
+    // If not found and we're on lesson 3, also search in lesson 1 and 2 word groups
+    if (id === 3) {
+      for (const group of lesson1WordGroups) {
+        const option = group.options.find((opt) => opt.thai === thai);
+        if (option) return option;
+      }
+      for (const group of lesson2WordGroups) {
+        const option = group.options.find((opt) => opt.thai === thai);
+        if (option) return option;
+      }
+    }
+
     return null;
   };
 
@@ -428,7 +468,7 @@ export function PhrasesPage() {
             </div>
           </div>
           <div className={styles.completeActions}>
-            {(id === 1 || id === 2) && (
+            {(id === 1 || id === 2 || id === 3) && (
               <Button
                 variant="ghost"
                 onClick={() => setStarted(false)}

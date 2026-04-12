@@ -3,14 +3,18 @@ import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { lessons as lessons1, lesson1Words, lesson1Phrases, lesson1Theory } from '../data/lesson1';
 import { lesson2, lesson2Words, lesson2Theory } from '../data/lesson2';
+import { lesson3, lesson3Words, lesson3Theory } from '../data/lesson3';
 import { useAppSelector } from '../app/hooks';
 import { selectAllLessonProgress } from '../features/progress/progressSlice';
 import { selectLessonWordsProgress } from '../features/words/wordsSlice';
 import styles from './LessonPage.module.css';
 
-const lessons = [...lessons1, lesson2];
+const lessons = [...lessons1, lesson2, lesson3];
 
 function getLessonData(id: number) {
+  if (id === 3) {
+    return { words: lesson3Words, phrases: [] as any[], theory: lesson3Theory };
+  }
   if (id === 2) {
     return { words: lesson2Words, phrases: [] as any[], theory: lesson2Theory };
   }

@@ -6,10 +6,11 @@ import { useAppDispatch } from '../app/hooks';
 import { updateChapterProgress } from '../features/progress/progressSlice';
 import { lesson1Theory, lesson1Words } from '../data/lesson1';
 import { lesson2Theory, lesson2Words } from '../data/lesson2';
+import { lesson3Theory, lesson3Words } from '../data/lesson3';
 import { speakThai } from '../utils/speech';
 import styles from './TheoryPage.module.css';
 
-const allWords = [...lesson1Words, ...lesson2Words];
+const allWords = [...lesson1Words, ...lesson2Words, ...lesson3Words];
 
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
@@ -24,6 +25,7 @@ const getAudioFile = (thai: string): string | null => {
 };
 
 function getLessonTheory(id: number) {
+  if (id === 3) return lesson3Theory;
   if (id === 2) return lesson2Theory;
   return lesson1Theory;
 }

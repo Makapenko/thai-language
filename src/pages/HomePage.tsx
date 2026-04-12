@@ -3,11 +3,12 @@ import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { lessons as lessons1 } from '../data/lesson1';
 import { lesson2 } from '../data/lesson2';
+import { lesson3 } from '../data/lesson3';
 import { useAppSelector } from '../app/hooks';
 import { selectAllLessonProgress } from '../features/progress/progressSlice';
 import styles from './HomePage.module.css';
 
-const lessons = [...lessons1, lesson2];
+const lessons = [...lessons1, lesson2, lesson3];
 
 export function HomePage() {
   const lessonProgress = useAppSelector(selectAllLessonProgress);
@@ -74,7 +75,7 @@ export function HomePage() {
           })}
 
           {/* Placeholder for future lessons */}
-          {Array.from({ length: 14 }, (_, i) => i + 3).map((num) => (
+          {Array.from({ length: 13 }, (_, i) => i + 4).map((num) => (
             <div key={num} className={styles.lessonLink}>
               <Card variant="outlined" className={styles.lessonCardLocked}>
                 <div className={styles.lessonNumber}>Урок {num}</div>
