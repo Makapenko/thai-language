@@ -107,7 +107,18 @@ export type SentenceType =
   | 'question_when'            // เขาไปเมื่อไหร่? — Когда он поедет?
   | 'question_where'           // เธออยู่ที่ไหน? — Где ты находишься?
   | 'question_why'             // ทำไมเขาไม่มา? — Почему он не пришёл?
-  | 'question_how';            // คุณไปอย่างไร? — Как ты поедешь?
+  | 'question_how'             // คุณไปอย่างไร? — Как ты поедешь?
+  // With location (cities/countries) (Lesson 1)
+  | 'present_affirmative_loc'  // Я живу в Бангкоке / Я еду в Бангкок
+  | 'present_negative_loc'     // Я не живу / Я не еду
+  | 'present_question_loc'     // Ты живёшь / Ты едешь?
+  | 'past_affirmative_loc'     // Я жил / Я поехал
+  | 'past_negative_loc'        // Я не жил / Я не ездил
+  | 'past_question_loc'        // Ты жил / Ты поехал?
+  | 'future_affirmative_loc'   // Я буду жить / Я поеду
+  | 'future_negative_loc'      // Я не буду жить / Я не поеду
+  | 'future_question_loc'      // Ты будешь жить / Ты поедешь?
+  | 'continuous_loc';          // Я сейчас живу / Я сейчас еду
 
 export interface SentencePattern {
   type: SentenceType;

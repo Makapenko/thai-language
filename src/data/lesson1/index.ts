@@ -1,7 +1,7 @@
 import type { Lesson } from '../types';
 
 export { lesson1Words } from './words';
-export { lesson1Phrases, lesson1WordGroups } from './phrases';
+export { lesson1Phrases, lesson1PhrasesWithObjects, lesson1PhrasesWithLocations, lesson1WordGroups } from './phrases';
 export { lesson1Theory } from './theory';
 
 export const lesson1: Lesson = {

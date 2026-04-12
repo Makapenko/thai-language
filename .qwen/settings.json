@@ -10,7 +10,8 @@
       "Bash(curl *)",
       "Bash(pkill *)",
       "Bash(sleep *)",
-      "Bash(sed *)"
+      "Bash(sed *)",
+      "Bash(node *)"
     ]
   },
   "$version": 3

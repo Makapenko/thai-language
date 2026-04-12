@@ -1,6 +1,7 @@
 import type { Phrase, WordGroup } from '../types';
-import { generatePhrases, generatePhrasesWithObjects } from '../phraseGenerator';
+import { generatePhrases, generatePhrasesWithObjects, generatePhrasesWithLocations } from '../phraseGenerator';
 import { pronouns, verbs, nouns } from '../vocabulary/lessons/lesson1';
+import { allLocations } from '../vocabulary/locations';
 
 // ============================================================
 // Фразы урока 1 — генерируются автоматически из vocabulary
@@ -53,6 +54,32 @@ export const lesson1PhrasesWithObjects: Phrase[] = generatePhrasesWithObjects(
 // Combined phrases for the lesson
 export const lesson1AllPhrases: Phrase[] = [...lesson1Phrases, ...lesson1PhrasesWithObjects];
 
+// Verbs compatible with locations: жить, ехать, приходить, путешествовать, летать
+const locationVerbs = verbs.filter(v =>
+  ['อยู่', 'ไป', 'มา', 'เที่ยว', 'บิน'].includes(v.thai)
+);
+
+// Generate phrases with locations (cities/countries)
+// 8 subjects × 5 verbs × 8 locations × 10 patterns = 3200 phrases
+export const lesson1PhrasesWithLocations: Phrase[] = generatePhrasesWithLocations(
+  pronouns,
+  locationVerbs,
+  allLocations,
+  [
+    'present_affirmative_loc',
+    'present_negative_loc',
+    'present_question_loc',
+    'past_affirmative_loc',
+    'past_negative_loc',
+    'past_question_loc',
+    'future_affirmative_loc',
+    'future_negative_loc',
+    'future_question_loc',
+    'continuous_loc',
+  ],
+  1
+);
+
 // ============================================================
 // Word groups for the phrase builder UI
 // ============================================================
@@ -85,6 +112,11 @@ export const lesson1WordGroups: WordGroup[] = [
     id: 'object',
     name: 'Объект',
     options: nouns.map(n => ({ thai: n.thai, transcription: n.transcription, russian: n.russian })),
+  },
+  {
+    id: 'location',
+    name: 'Город/Страна',
+    options: allLocations.map(loc => ({ thai: loc.thai, transcription: loc.transcription, russian: loc.russian })),
   },
   {
     id: 'ending',

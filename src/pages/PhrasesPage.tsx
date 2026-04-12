@@ -5,7 +5,7 @@ import { Button } from '../components/Button';
 import { PhraseProgressBar } from '../components/PhraseProgressBar';
 import { TheoryModal } from '../components/TheoryModal/TheoryModal';
 import UniversalTimer from '../components/UniversalTimer/UniversalTimer';
-import { lesson1Phrases, lesson1WordGroups } from '../data/lesson1';
+import { lesson1Phrases, lesson1PhrasesWithObjects, lesson1PhrasesWithLocations, lesson1WordGroups } from '../data/lesson1';
 import {
   lesson2WordGroups,
   lesson2Phrases,
@@ -18,6 +18,7 @@ import {
   setPhrases,
   setWordGroups,
   selectPart,
+  unselectLastPart,
   clearSelectedParts,
   submitPhrase,
   nextPhrase,
@@ -72,14 +73,29 @@ export function PhrasesPage() {
   const dispatch = useAppDispatch();
   const id = parseInt(lessonId || '1', 10);
 
-  // Phrase type selection state (lesson 2 only)
+  // Phrase type selection state (lessons 1 and 2)
   const [started, setStarted] = useState(false);
-  const [checked, setChecked] = useState<Record<string, boolean>>({
-    standard: true,
-    withObjects: true,
-    withPronounObjects: true,
-    questions: true,
-  });
+
+  // Phrase type labels per lesson
+  const LESSON_PHRASE_TYPES: Record<number, Record<string, string>> = {
+    1: {
+      standard: 'Стандартные',
+      withObjects: 'С объектами (сущ.)',
+      withLocations: 'С городами и странами',
+    },
+    2: {
+      standard: 'Стандартные',
+      withObjects: 'С объектами (сущ.)',
+      withPronounObjects: 'С местоимениями-объектами',
+      questions: 'Вопросительные',
+    },
+  };
+
+  const phraseTypes = LESSON_PHRASE_TYPES[id] || LESSON_PHRASE_TYPES[1];
+
+  const [checked, setChecked] = useState<Record<string, boolean>>(
+    Object.fromEntries(Object.keys(phraseTypes).map((type) => [type, true]))
+  );
 
   const toggle = (type: string) => {
     setChecked((prev) => ({ ...prev, [type]: !prev[type] }));
@@ -99,7 +115,8 @@ export function PhrasesPage() {
     setStarted(true);
   };
 
-  const [selectedTypes, setSelectedTypes] = useState<string[]>(['standard', 'withObjects', 'withPronounObjects', 'questions']);
+  const defaultTypesForLesson = Object.keys(LESSON_PHRASE_TYPES[id] || LESSON_PHRASE_TYPES[1]);
+  const [selectedTypes, setSelectedTypes] = useState<string[]>(defaultTypesForLesson);
 
   // Timer component ID for phrases section
   const timerComponentId = `lesson-${id}-phrases`;
@@ -151,7 +168,20 @@ export function PhrasesPage() {
       phrases = filteredPhrases;
       wordGroups = lesson2WordGroups;
     } else {
-      phrases = lesson1Phrases;
+      // Filter lesson 1 phrases based on selected types
+      const filteredPhrases: typeof lesson1Phrases = [];
+
+      if (selectedTypes.includes('standard')) {
+        filteredPhrases.push(...lesson1Phrases);
+      }
+      if (selectedTypes.includes('withObjects')) {
+        filteredPhrases.push(...lesson1PhrasesWithObjects);
+      }
+      if (selectedTypes.includes('withLocations')) {
+        filteredPhrases.push(...lesson1PhrasesWithLocations);
+      }
+
+      phrases = filteredPhrases;
       wordGroups = lesson1WordGroups;
     }
 
@@ -310,6 +340,12 @@ export function PhrasesPage() {
     }
   };
 
+  // Handle undo last word selection
+  const handleUndoLastWord = () => {
+    if (showResult || selectedParts.length === 0) return;
+    dispatch(unselectLastPart());
+  };
+
   // Handle next
   const handleNext = () => {
     if (justAdvanced) {
@@ -392,7 +428,7 @@ export function PhrasesPage() {
             </div>
           </div>
           <div className={styles.completeActions}>
-            {id === 2 && (
+            {(id === 1 || id === 2) && (
               <Button
                 variant="ghost"
                 onClick={() => setStarted(false)}
@@ -415,14 +451,9 @@ export function PhrasesPage() {
     );
   }
 
-  // Start screen for lesson 2 — phrase type selection
-  if (id === 2 && !started) {
-    const PHRASE_TYPE_LABELS: Record<string, string> = {
-      standard: 'Стандартные',
-      withObjects: 'С объектами (сущ.)',
-      withPronounObjects: 'С местоимениями-объектами',
-      questions: 'Вопросительные',
-    };
+  // Start screen — phrase type selection (lessons 1 and 2)
+  if (!started) {
+    const PHRASE_TYPE_LABELS = phraseTypes;
 
     const anyChecked = Object.values(checked).some((v) => v);
 
@@ -501,6 +532,15 @@ export function PhrasesPage() {
                     </button>
                   );
                 })}
+                {!showResult && selectedParts.length > 0 && (
+                  <button
+                    className={styles.undoButton}
+                    onClick={handleUndoLastWord}
+                    title="Отменить последнее слово"
+                  >
+                    ↩
+                  </button>
+                )}
               </div>
             ) : null}
           </div>

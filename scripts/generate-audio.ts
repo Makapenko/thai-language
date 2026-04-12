@@ -8,6 +8,7 @@
  */
 
 import { lesson2Words } from '../src/data/lesson2/words.js';
+import { lesson1Words } from '../src/data/lesson1/words.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -180,10 +181,15 @@ async function main(): Promise<void> {
 
   const allFailedItems: FailedItem[] = [];
 
-  const wordStats = await processItems(lesson2Words, 'words');
+  const lesson1Stats = await processItems(lesson1Words, 'lesson 1 words');
+  allFailedItems.push(...lesson1Stats.failedItems);
+
+  console.log(`\n✅ Lesson 1 Words: ${lesson1Stats.success}/${lesson1Words.length} generated`);
+
+  const wordStats = await processItems(lesson2Words, 'lesson 2 words');
   allFailedItems.push(...wordStats.failedItems);
 
-  console.log(`\n✅ Words: ${wordStats.success}/${lesson2Words.length} generated`);
+  console.log(`\n✅ Lesson 2 Words: ${wordStats.success}/${lesson2Words.length} generated`);
 
   if (allFailedItems.length > 0) {
     const retryResult = await retryFailed(allFailedItems);
@@ -200,8 +206,8 @@ async function main(): Promise<void> {
     }
   }
 
-  const totalItems = lesson2Words.length;
-  const totalSuccess = wordStats.success;
+  const totalItems = lesson1Words.length + lesson2Words.length;
+  const totalSuccess = lesson1Stats.success + wordStats.success;
   const totalFailed = allFailedItems.length;
 
   console.log('\n' + '='.repeat(60));

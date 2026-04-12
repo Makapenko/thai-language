@@ -114,6 +114,13 @@ const phrasesSlice = createSlice({
       state.currentGroupIndex += 1;
     },
 
+    unselectLastPart: (state) => {
+      if (state.selectedParts.length > 0) {
+        state.selectedParts.pop();
+        state.currentGroupIndex -= 1;
+      }
+    },
+
     clearSelectedParts: (state) => {
       state.selectedParts = [];
       state.currentGroupIndex = 0;
@@ -262,6 +269,7 @@ export const {
   initializeDailyProgress,
   updatePhraseProgress,
   selectPart,
+  unselectLastPart,
   clearSelectedParts,
   submitPhrase,
   nextPhrase,

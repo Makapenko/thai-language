@@ -2,10 +2,13 @@ import type { Phrase, SentenceType } from './types';
 import { patterns, patternsWithObject, patternsWithPronounObject } from './phrasePatterns';
 import { questionPatterns } from './phrasePatterns.lesson2';
 import type { QuestionWord } from './phrasePatterns.lesson2';
+import { patternsWithLocation } from './phrasePatterns.location';
 import { isVerbObjectCompatible } from './vocabulary/verbObjectCompatibility';
+import type { Location } from './vocabulary/locations';
 
 // Re-export types for backward compatibility
 export type { Subject, Verb, Noun, ObjectPronoun } from './phrasePatterns';
+export type { Location } from './vocabulary/locations';
 
 // Re-export question types for lesson 2
 export type { QuestionWord } from './phrasePatterns.lesson2';
@@ -231,6 +234,40 @@ export function generatePhrasesWithPronounObjects(
             thai: pattern.buildThai(subject, verb, objectPronoun),
             transcription: pattern.buildTranscription(subject, verb, objectPronoun),
             structure: pattern.buildStructure(subject, verb, objectPronoun),
+            lessonId,
+          });
+        }
+      }
+    }
+  }
+
+  return phrases;
+}
+
+// Generate phrases with locations from subjects, verbs, locations, and pattern types
+export function generatePhrasesWithLocations(
+  subjects: Subject[],
+  verbs: Verb[],
+  locations: Location[],
+  patternTypes: SentenceType[],
+  lessonId: number,
+  idPrefix: string = 'pl'
+): Phrase[] {
+  const phrases: Phrase[] = [];
+  let counter = 1;
+
+  const selectedPatterns = patternsWithLocation.filter(p => patternTypes.includes(p.type));
+
+  for (const pattern of selectedPatterns) {
+    for (const subject of subjects) {
+      for (const verb of verbs) {
+        for (const location of locations) {
+          phrases.push({
+            id: `${idPrefix}${lessonId}-${counter++}`,
+            russian: pattern.russianTemplate(subject, verb, location),
+            thai: pattern.buildThai(subject, verb, location),
+            transcription: pattern.buildTranscription(subject, verb, location),
+            structure: pattern.buildStructure(subject, verb, location),
             lessonId,
           });
         }

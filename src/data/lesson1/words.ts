@@ -122,4 +122,17 @@ export const lesson1Words: Word[] = [
 
   // Service words (Служебные слова - не показываются в упражнении "Слова")
   { id: 'w1-112', thai: 'จะไม่', transcription: 'jà-mâi', russian: 'не будет (отрицание будущего)', category: 'particle', lessonId: 1, isService: true },
+  { id: 'w1-121', thai: 'อยู่ที่', transcription: 'yùu tîi', russian: 'жить в (находиться)', category: 'verb', lessonId: 1, isService: true },
+
+  // Locations — cities
+  { id: 'w1-113', thai: 'กรุงเทพ', transcription: 'grung-têp', russian: 'Бангкок', category: 'noun', lessonId: 1 },
+  { id: 'w1-114', thai: 'เชียงใหม่', transcription: 'chiang-mài', russian: 'Чиангмай', category: 'noun', lessonId: 1 },
+  { id: 'w1-115', thai: 'หาดใหญ่', transcription: 'hàat-yài', russian: 'Хатъяй', category: 'noun', lessonId: 1 },
+  { id: 'w1-116', thai: 'พัทยา', transcription: 'pat-taa-yaa', russian: 'Паттайя', category: 'noun', lessonId: 1 },
+
+  // Locations — countries
+  { id: 'w1-117', thai: 'ไทย', transcription: 'tai', russian: 'Таиланд', category: 'noun', lessonId: 1 },
+  { id: 'w1-118', thai: 'จีน', transcription: 'jeen', russian: 'Китай', category: 'noun', lessonId: 1 },
+  { id: 'w1-119', thai: 'ญี่ปุ่น', transcription: 'yîi-bpùn', russian: 'Япония', category: 'noun', lessonId: 1 },
+  { id: 'w1-120', thai: 'รัสเซีย', transcription: 'rát-sia', russian: 'Россия', category: 'noun', lessonId: 1 },
 ];
