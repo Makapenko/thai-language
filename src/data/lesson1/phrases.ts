@@ -106,7 +106,10 @@ export const lesson1WordGroups: WordGroup[] = [
   {
     id: 'verb',
     name: 'Глагол',
-    options: verbs.map(v => ({ thai: v.thai, transcription: v.transcription, russian: v.infinitive })),
+    options: [
+      ...verbs.map(v => ({ thai: v.thai, transcription: v.transcription, russian: v.infinitive })),
+      { thai: 'อยู่ที่', transcription: 'yùu tîi', russian: 'жить в (находиться)' },
+    ],
   },
   {
     id: 'object',

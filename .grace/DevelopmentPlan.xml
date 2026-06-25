@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PROJECT_GRAPH>
+  <MODULE id="app" path="src/app">
+    <CONTRACT_REF>store.ts, hooks.ts</CONTRACT_REF>
+    <LINKS>Redux Toolkit, react-redux</LINKS>
+  </MODULE>
+
+  <MODULE id="features-lessons" path="src/features/lessons">
+    <CONTRACT_REF>lessonsSlice.ts</CONTRACT_REF>
+    <LINKS>app, data/lesson*, pages/LessonPage</LINKS>
+  </MODULE>
+
+  <MODULE id="features-words" path="src/features/words">
+    <CONTRACT_REF>wordsSlice.ts</CONTRACT_REF>
+    <LINKS>app, data/vocabulary, pages/WordsPage</LINKS>
+  </MODULE>
+
+  <MODULE id="features-phrases" path="src/features/phrases">
+    <CONTRACT_REF>phrasesSlice.ts</CONTRACT_REF>
+    <LINKS>app, data/phrasePatterns, pages/PhrasesPage</LINKS>
+  </MODULE>
+
+  <MODULE id="features-progress" path="src/features/progress">
+    <CONTRACT_REF>progressSlice.ts, storage.ts</CONTRACT_REF>
+    <LINKS>app, localStorage, hooks/useStorageSync</LINKS>
+  </MODULE>
+
+  <MODULE id="components-ui" path="src/components">
+    <CONTRACT_REF>Button, Card, ProgressBar, Layout</CONTRACT_REF>
+    <LINKS>CSS Modules</LINKS>
+  </MODULE>
+
+  <MODULE id="components-charts" path="src/components/Charts">
+    <CONTRACT_REF>PhrasesChart, WordsChart</CONTRACT_REF>
+    <LINKS>Recharts, features/progress</LINKS>
+  </MODULE>
+
+  <MODULE id="components-today-tasks" path="src/components/TodayTasks">
+    <CONTRACT_REF>TodayTasks, FavoritesComponent, ActivityHistoryBar</CONTRACT_REF>
+    <LINKS>features/progress, utils/dailyTasksUtils</LINKS>
+  </MODULE>
+
+  <MODULE id="components-calendar" path="src/components/ProgressCalendar">
+    <CONTRACT_REF>ProgressCalendar, DayDetails</CONTRACT_REF>
+    <LINKS>features/progress, utils/dateUtils</LINKS>
+  </MODULE>
+
+  <MODULE id="pages" path="src/pages">
+    <CONTRACT_REF>HomePage, LessonPage, WordsPage, PhrasesPage, TheoryPage, CalendarPage, TodayTasksPage</CONTRACT_REF>
+    <LINKS>features/*, components/*</LINKS>
+  </MODULE>
+
+  <MODULE id="data-lessons" path="src/data">
+    <CONTRACT_REF>lesson1, lesson2, lesson3, types.ts, phrasePatterns, phraseGenerator, vocabulary</CONTRACT_REF>
+    <LINKS>features/lessons, features/words, features/phrases</LINKS>
+  </MODULE>
+
+  <MODULE id="utils-speech" path="src/utils/speech">
+    <CONTRACT_REF>Web Speech API wrapper</CONTRACT_REF>
+  </MODULE>
+</PROJECT_GRAPH>

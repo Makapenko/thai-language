@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REQUIREMENTS>
+  <REQUIREMENT id="R-001">
+    <AAG>User → uses → responsive design on mobile/tablet/desktop</AAG>
+    <MODULES_AFFECTED>components/*, styles/*</MODULES_AFFECTED>
+    <STATUS>pending</STATUS>
+    <PRIORITY>medium</PRIORITY>
+  </REQUIREMENT>
+
+  <REQUIREMENT id="R-002">
+    <AAG>System → pregenerates → audio files for faster playback</AAG>
+    <MODULES_AFFECTED>utils/speech, docs/audio-pregeneration.md</MODULES_AFFECTED>
+    <STATUS>pending</STATUS>
+    <PRIORITY>low</PRIORITY>
+  </REQUIREMENT>
+
+  <REQUIREMENT id="R-003">
+    <AAG>User → practices → tones recognition</AAG>
+    <MODULES_AFFECTED>new feature (not implemented)</MODULES_AFFECTED>
+    <STATUS>proposal</STATUS>
+    <PRIORITY>low</PRIORITY>
+  </REQUIREMENT>
+
+  <REQUIREMENT id="R-004">
+    <AAG>User → practices → listening comprehension</AAG>
+    <MODULES_AFFECTED>new feature (not implemented)</MODULES_AFFECTED>
+    <STATUS>proposal</STATUS>
+    <PRIORITY>low</PRIORITY>
+  </REQUIREMENT>
+</REQUIREMENTS>

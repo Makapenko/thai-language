@@ -193,8 +193,7 @@ async function main(): Promise<void> {
   console.log(`\n✅ Lesson 2 Words: ${wordStats.success}/${lesson2Words.length} generated`);
 
   // Names audio
-  const nameItems = allNames.map((n, i) => ({ id: `n${i + 1}`, thai: n.thai }));
-  const nameStats = await processItems(nameItems, 'names');
+  const nameStats = await processItems(allNames, 'names');
   allFailedItems.push(...nameStats.failedItems);
 
   console.log(`\n✅ Names: ${nameStats.success}/${allNames.length} generated`);

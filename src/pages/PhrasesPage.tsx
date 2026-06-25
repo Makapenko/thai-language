@@ -44,6 +44,7 @@ import { shuffle } from '../utils/shuffle';
 import { lesson1Words } from '../data/lesson1/words';
 import { lesson2Words } from '../data/lesson2/words';
 import { lesson3Words } from '../data/lesson3/words';
+import { allNames } from '../data/vocabulary/names';
 import styles from './PhrasesPage.module.css';
 
 // Статус слова в списке ошибок
@@ -65,7 +66,10 @@ const allLessonWords = [...lesson1Words, ...lesson2Words, ...lesson3Words];
 // Find word ID by Thai text for audio file lookup
 const findWordIdByThai = (thai: string): string | null => {
   const word = allLessonWords.find(w => w.thai === thai);
-  return word ? word.id : null;
+  if (word) return word.id;
+
+  const name = allNames.find(n => n.thai === thai);
+  return name ? name.id : null;
 };
 
 // Get audio file path for a Thai word

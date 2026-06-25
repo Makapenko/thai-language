@@ -5,6 +5,7 @@ import type { ObjectPronoun } from '../phrasePatterns';
 // Name — тайские личные имена
 // ============================================================
 export interface Name {
+  id: string;
   thai: string;
   transcription: string;
   russian: string;         // "Сомчай", "Плой" и т.д.
@@ -16,20 +17,20 @@ export interface Name {
 // Мужские имена (4 шт) — из статистики DOPA по распространённости
 // ============================================================
 export const maleNames: Name[] = [
-  { thai: 'สมชาย', transcription: 'sŏm-chaai', russian: 'Сомчай', gender: 'masc', conjIndex: 2 },   // 479 924 носителя — #1 в Таиланде
-  { thai: 'ประเสริฐ', transcription: 'bpra-sèrt', russian: 'Прасерт', gender: 'masc', conjIndex: 2 },  // 268 094 — #3
-  { thai: 'สมบูรณ์', transcription: 'sŏm-buun', russian: 'Сомбун', gender: 'masc', conjIndex: 2 },     // 248 205 — #4
-  { thai: 'สมศักดิ์', transcription: 'sŏm-sàk', russian: 'Сомсак', gender: 'masc', conjIndex: 2 },      // из top-10 мужских имён
+  { id: 'n1', thai: 'สมชาย', transcription: 'sŏm-chaai', russian: 'Сомчай', gender: 'masc', conjIndex: 2 },   // 479 924 носителя — #1 в Таиланде
+  { id: 'n2', thai: 'ประเสริฐ', transcription: 'bpra-sèrt', russian: 'Прасерт', gender: 'masc', conjIndex: 2 },  // 268 094 — #3
+  { id: 'n3', thai: 'สมบูรณ์', transcription: 'sŏm-buun', russian: 'Сомбун', gender: 'masc', conjIndex: 2 },     // 248 205 — #4
+  { id: 'n4', thai: 'สมศักดิ์', transcription: 'sŏm-sàk', russian: 'Сомсак', gender: 'masc', conjIndex: 2 },      // из top-10 мужских имён
 ];
 
 // ============================================================
 // Женские имена (4 шт, включая Плой) — из статистики DOPA
 // ============================================================
 export const femaleNames: Name[] = [
-  { thai: 'สมจิต', transcription: 'sŏm-jìt', russian: 'Сомчит', gender: 'fem', conjIndex: 2 },      // 281 050 — #2 в общем списке
-  { thai: 'ปราณี', transcription: 'bpra-nii', russian: 'Прани', gender: 'fem', conjIndex: 2 },      // 171 060
-  { thai: 'กาญจนา', transcription: 'gaan-jà-náa', russian: 'Канчана', gender: 'fem', conjIndex: 2 }, // 165 525
-  { thai: 'ปอย', transcription: 'bpɔɔi', russian: 'Плой', gender: 'fem', conjIndex: 2 },             // популярное имя, остаётся по запросу
+  { id: 'n5', thai: 'สมจิต', transcription: 'sŏm-jìt', russian: 'Сомчит', gender: 'fem', conjIndex: 2 },      // 281 050 — #2 в общем списке
+  { id: 'n6', thai: 'ปราณี', transcription: 'bpra-nii', russian: 'Прани', gender: 'fem', conjIndex: 2 },      // 171 060
+  { id: 'n7', thai: 'กาญจนา', transcription: 'gaan-jà-náa', russian: 'Канчана', gender: 'fem', conjIndex: 2 }, // 165 525
+  { id: 'n8', thai: 'ปอย', transcription: 'bpɔɔi', russian: 'Плой', gender: 'fem', conjIndex: 2 },             // популярное имя, остаётся по запросу
 ];
 
 // ============================================================

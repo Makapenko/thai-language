@@ -5,6 +5,8 @@
  */
 
 import { lesson1Words } from '../src/data/lesson1/words.js';
+import { lesson2Words } from '../src/data/lesson2/words.js';
+import { allNames } from '../src/data/vocabulary/names.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -12,22 +14,24 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const OUTPUT_DIR = path.join(__dirname, '..', 'public', 'audio', 'words');
 
-console.log('📊 Audio Files Status (Words Only)\n');
+console.log('📊 Audio Files Status\n');
 console.log('💡 Phrases are played by combining word audio files\n');
 console.log('='.repeat(50));
 
 const missingList: Array<{ id: string; thai: string }> = [];
 
-for (const item of lesson1Words) {
+const audioItems = [...lesson1Words, ...lesson2Words, ...allNames];
+
+for (const item of audioItems) {
   const filepath = path.join(OUTPUT_DIR, `${item.id}.mp3`);
   if (!fs.existsSync(filepath)) {
     missingList.push({ id: item.id, thai: item.thai });
   }
 }
 
-const exists = lesson1Words.length - missingList.length;
+const exists = audioItems.length - missingList.length;
 
-console.log(`\n📚 Words: ${exists}/${lesson1Words.length} files exist`);
+console.log(`\n📚 Words and names: ${exists}/${audioItems.length} files exist`);
 
 if (missingList.length > 0) {
   console.log(`   Missing: ${missingList.length}`);
@@ -37,7 +41,7 @@ if (missingList.length > 0) {
 }
 
 console.log('\n' + '='.repeat(50));
-console.log(`\n📊 Total: ${exists}/${lesson1Words.length} files exist`);
+console.log(`\n📊 Total: ${exists}/${audioItems.length} files exist`);
 console.log(`   Missing: ${missingList.length} files\n`);
 
 if (missingList.length > 0) {

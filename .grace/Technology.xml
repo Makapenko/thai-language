@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<TECHNOLOGY_STACK>
+  <FRAMEWORK name="React" version="19.2" />
+  <BUILD_TOOL name="Vite" version="7.2.4" />
+  <LANG>TypeScript</LANG>
+  <STATE_MANAGER>Redux Toolkit</STATE_MANAGER>
+  <ROUTER>React Router v7</ROUTER>
+  <CHARTS>Recharts</CHARTS>
+  <STYLING>CSS Modules</STYLING>
+  <AUDIO>Web Speech API</AUDIO>
+  <STORAGE>localStorage</STORAGE>
+  <TESTING>ESLint</TESTING>
+  <CONSTRAINTS>
+    <RULE>Использовать функциональные компоненты + хуки</RULE>
+    <RULE>Избегать any в TypeScript</RULE>
+    <RULE>Не использовать default exports для компонентов</RULE>
+    <RULE>CSS Modules для стилизации (без UI-фреймворков)</RULE>
+  </CONSTRAINTS>
+</TECHNOLOGY_STACK>
